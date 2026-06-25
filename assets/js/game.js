@@ -68,6 +68,10 @@ function throwItem() {
   const t = Math.abs(vy / GRAVITY);
   const vx = (targetX - x) / t;
   
+  // Guarantee at least a bit of rotation, randomizing the direction
+  let rotSpeed = Math.random() * 0.02 + 0.01;
+  if (Math.random() < 0.5) rotSpeed = -rotSpeed;
+
   gameItems.push({
     image: proto.image,
     type: proto.type,
@@ -76,7 +80,7 @@ function throwItem() {
     vx: vx,
     vy: vy,
     rotation: Math.random() * Math.PI * 2,
-    rotationSpeed: (Math.random() - 0.5) * 0.07 // sweet spot rotation
+    rotationSpeed: rotSpeed
   });
 }
 
