@@ -9,14 +9,14 @@ var gameCtx = null;
 var gameItems = [];
 var gameAnimationFrame = null;
 var spawnTimer = 0;
-const GRAVITY = 0.11;
+const GRAVITY = 0.45;
 
 const aiImages = [
-  "Cyber_Frame_Mockup.jpg", "NYC_generated.jpg", "Nature_Frame_Mockup.jpg", 
+  "NYC_generated.jpg", 
   "abstract_art_generated.jpg", "architecture_generated.jpg", "banana-hound.png", 
   "banana-usb.jpg", "blue-runner-shark.jpg", "cactus-elephant-clock.jpg", 
   "capybara-call-center.png", "cat_loaf.jpg", "crocodile-wrestle.png", 
-  "espresso-goose.png", "fire.png", "frog-tire.png", "glass-dachshund.png", 
+  "espresso-goose.png", "frog-tire.png", "glass-dachshund.png", 
   "greek-frog.png", "jogging_generated.jpg", "munich_generated.jpg", 
   "pelican-open-for-work.png", "port_generated.jpg", "rainforest_generated.jpg", 
   "shark-vase.png", "shrimp-benediction-20260617.png", "tree-figure.png", 
@@ -54,11 +54,13 @@ function throwItem() {
   if (!gameCanvas || ITEMS_POOL.length === 0) return;
   const proto = ITEMS_POOL[Math.floor(Math.random() * ITEMS_POOL.length)];
   
-  const x = gameCanvas.width * (0.2 + Math.random() * 0.6);
+  // Toss mostly from underside into the frame
+  const x = gameCanvas.width * (0.25 + Math.random() * 0.5);
   const y = gameCanvas.height + 60;
   
-  const targetX = gameCanvas.width / 2 + (Math.random() - 0.5) * 200;
-  const peakHeight = gameCanvas.height * (0.15 + Math.random() * 0.35);
+  // Don't throw too much outside left/right, keep it in frame
+  const targetX = gameCanvas.width * (0.3 + Math.random() * 0.4);
+  const peakHeight = gameCanvas.height * (0.1 + Math.random() * 0.4);
   
   const dy = peakHeight - y;
   const vy = -Math.sqrt(Math.abs(2 * GRAVITY * dy));
@@ -74,7 +76,7 @@ function throwItem() {
     vx: vx,
     vy: vy,
     rotation: Math.random() * Math.PI * 2,
-    rotationSpeed: (Math.random() - 0.5) * 0.025
+    rotationSpeed: (Math.random() - 0.5) * 0.07 // sweet spot rotation
   });
 }
 
@@ -84,10 +86,21 @@ function gameLoop() {
   gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
   
   spawnTimer++;
-  // Spawn every ~1.5s (90 frames)
-  if (spawnTimer >= 90) {
+  
+  // Dynamic spawn rate based on game progress
+  const progress = Math.min(gameElapsedSeconds / gameMaxSeconds, 1.0);
+  const baseFrames = 90;
+  const minFrames = 25;
+  const currentSpawnRate = Math.floor(baseFrames - (baseFrames - minFrames) * progress);
+  
+  if (spawnTimer >= currentSpawnRate) {
     spawnTimer = 0;
-    throwItem();
+    
+    // Throw more images at once as game progresses
+    const burstCount = (progress > 0.4 && Math.random() < 0.4) ? 2 : 1;
+    for (let j = 0; j < burstCount; j++) {
+      setTimeout(throwItem, j * 250);
+    }
   }
   
   for (let i = gameItems.length - 1; i >= 0; i--) {
@@ -107,29 +120,32 @@ function gameLoop() {
     gameCtx.translate(item.x, item.y);
     gameCtx.rotate(item.rotation);
     
-    // Draw 1:1 image with rounded corners
-    const size = 150;
-    const half = size / 2;
-    
-    // Add subtle shadow for depth
-    gameCtx.shadowBlur = 10;
-    gameCtx.shadowColor = "rgba(0, 0, 0, 0.4)";
-    
-    gameCtx.beginPath();
-    gameCtx.roundRect(-half, -half, size, size, 16);
-    gameCtx.fillStyle = "#fff";
-    gameCtx.fill(); // fill to render shadow and background
-    
-    gameCtx.shadowColor = "transparent"; // disable shadow for image clip
-    gameCtx.clip();
-    
-    // Center and crop the image to 1:1
+    // Draw image at original aspect ratio with increased size
     const img = item.image;
     if (img.complete && img.naturalWidth > 0) {
-      const minDim = Math.min(img.naturalWidth, img.naturalHeight);
-      const sx = (img.naturalWidth - minDim) / 2;
-      const sy = (img.naturalHeight - minDim) / 2;
-      gameCtx.drawImage(img, sx, sy, minDim, minDim, -half, -half, size, size);
+      const targetMaxDim = 280; // Increased size
+      let w = img.naturalWidth;
+      let h = img.naturalHeight;
+      const scale = targetMaxDim / Math.max(w, h);
+      w *= scale;
+      h *= scale;
+      
+      const halfW = w / 2;
+      const halfH = h / 2;
+
+      // Add subtle shadow for depth
+      gameCtx.shadowBlur = 12;
+      gameCtx.shadowColor = "rgba(0, 0, 0, 0.4)";
+      
+      gameCtx.beginPath();
+      gameCtx.roundRect(-halfW, -halfH, w, h, 16);
+      gameCtx.fillStyle = "#fff";
+      gameCtx.fill(); // fill to render shadow and background
+      
+      gameCtx.shadowColor = "transparent"; // disable shadow for image clip
+      gameCtx.clip();
+      
+      gameCtx.drawImage(img, -halfW, -halfH, w, h);
     }
     
     gameCtx.restore();
