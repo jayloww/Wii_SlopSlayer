@@ -7,7 +7,7 @@
   background-repeat: no-repeat;
   position: relative;
   overflow: hidden;
-  cursor: crosshair;
+  cursor: none;
 }
 
 #game-canvas {
@@ -20,6 +20,17 @@
   pointer-events: none;
 }
 
+#slash-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  display: block;
+  cursor: none;
+}
+
 .game-hud {
   display: flex;
   justify-content: space-between;
@@ -27,6 +38,9 @@
   padding: 36px 48px;
   box-sizing: border-box;
   width: 100%;
+  position: relative;
+  z-index: 20;
+  pointer-events: none;
 }
 
 .game-hud-left,
