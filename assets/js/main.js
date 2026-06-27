@@ -24,16 +24,20 @@ function zip(){
 	var audio = document.getElementById("zip");
 	audio.play();
 	select();
-	var music = document.getElementById("bg-music");
-	music.pause();
+	var bg = document.getElementById("bg-music");
+	if (bg) bg.pause();
+	var idle = document.getElementById("idle-music");
+	if (idle) idle.play();
 }
 
 // back
 function back(){
 	var audio = document.getElementById("back");
 	audio.play();
-	var music = document.getElementById("bg-music");
-	music.play();
+	var idle = document.getElementById("idle-music");
+	if (idle) idle.pause();
+	var bg = document.getElementById("bg-music");
+	if (bg) bg.play();
 }
 
 // date & time

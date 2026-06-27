@@ -308,6 +308,12 @@ function gameLoop() {
   
   const progress = Math.min(gameElapsedSeconds / gameMaxSeconds, 1.0);
 
+  // Dynamically accelerate game music from 0.8x to 1.2x
+  var gameMusic = document.getElementById("game-music");
+  if (gameMusic) {
+    gameMusic.playbackRate = 0.8 + (progress * 0.4);
+  }
+
   // Only spawn while the clock is still running
   if (gameElapsedSeconds < gameMaxSeconds) {
     // Two-phase spawn rate (frames between throws):
@@ -640,6 +646,9 @@ function stopGameSlash() {
 function initGame() {
   stopGameTimer();
   
+  var idle = document.getElementById("idle-music");
+  if (idle) idle.pause();
+  
   gameCanvas = document.getElementById("game-canvas");
   if (gameCanvas) {
     gameCtx = gameCanvas.getContext("2d");
@@ -664,20 +673,13 @@ function initGame() {
   var gameMusic = document.getElementById("game-music");
   if (gameMusic) {
     gameMusic.currentTime = 0;
-    gameMusic.volume = 0.3;
-    gameMusic.playbackRate = 1.0;
-    gameMusic.play().catch(function(e){});
+    gameMusic.playbackRate = 0.8;
+    gameMusic.play().catch(e => console.error("Audio play error:", e));
   }
 
   gameTimerInterval = setInterval(function() {
     gameElapsedSeconds += 1;
     updateGameHud();
-    
-    if (gameMusic) {
-      // Escalate music speed slightly as time runs out
-      var progress = gameElapsedSeconds / gameMaxSeconds;
-      gameMusic.playbackRate = 1.0 + (progress * 0.35); 
-    }
 
     if (gameElapsedSeconds >= gameMaxSeconds) {
       clearInterval(gameTimerInterval);
@@ -722,6 +724,13 @@ function showEndScreen() {
 
   // Restore Wii cursor for the end screen
   $("body").addClass("end-screen-open");
+  
+  // Play idle sound in the end menu
+  var idle = document.getElementById("idle-music");
+  if (idle) {
+    idle.currentTime = 0;
+    idle.play();
+  }
 }
 
 function startGame() {
@@ -740,6 +749,8 @@ function restartGame() {
 
 function endGoToMenu() {
   back();
+  var idle = document.getElementById("idle-music");
+  if (idle) idle.pause();
   // Strip all game/channel state from body so the menu loads clean
   $("body").removeClass("in-game end-screen-open channel-splash splash-switch");
   stopGameTimer();

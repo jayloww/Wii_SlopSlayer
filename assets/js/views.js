@@ -45,8 +45,10 @@ function loadViewContents(v, t) {
         }
 
         if (v === "game") {
-          var music = document.getElementById("bg-music");
-          music.pause();
+              var idle = document.getElementById("idle-music");
+          if (idle) idle.pause();
+              var bg = document.getElementById("bg-music");
+          if (bg) bg.pause();
           initGame();
         }
 
@@ -62,8 +64,10 @@ function loadViewContents(v, t) {
             $( ".black" ).removeClass( "animate" );
             if (v === "menu") {
               // play menu music
-              var music = document.getElementById("bg-music");
-            	music.play();
+                  var bg = document.getElementById("bg-music");
+            	if (bg) bg.play();
+                  var idle = document.getElementById("idle-music");
+                if (idle) idle.pause();
 
               // play startup sound if it's the first time
               if (previousView === "default") {
