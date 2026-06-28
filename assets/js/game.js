@@ -1,20 +1,20 @@
 /* ─── timer / score ──────────────────────────────────────── */
 
-var gameTimerInterval  = null;
+var gameTimerInterval = null;
 var gameElapsedSeconds = 0;
-var gameScore          = 0;
-var gameMaxSeconds     = 45;
+var gameScore = 0;
+var gameMaxSeconds = 45;
 
 var ITEMS_POOL = [];
-var AI_POOL    = [];
-var REAL_POOL  = [];
+var AI_POOL = [];
+var REAL_POOL = [];
 var gameCanvas = null;
 var gameCtx = null;
 var gameItems = [];
 var slicedPieces = [];
 var gameAnimationFrame = null;
 var spawnTimer = 0;
-var slicedAI   = 0;
+var slicedAI = 0;
 var slicedReal = 0;
 var currentCombo = 0;
 const GRAVITY = 0.075;
@@ -55,9 +55,9 @@ realImages.forEach(src => {
 /* ── Shuffled deck: draw every item once before repeating, never same order twice ── */
 function ShuffledDeck(source) {
   this.source = source;
-  this.deck   = [];
+  this.deck = [];
 }
-ShuffledDeck.prototype._refill = function() {
+ShuffledDeck.prototype._refill = function () {
   this.deck = this.source.slice();
   // Fisher-Yates shuffle
   for (let i = this.deck.length - 1; i > 0; i--) {
@@ -65,13 +65,13 @@ ShuffledDeck.prototype._refill = function() {
     const tmp = this.deck[i]; this.deck[i] = this.deck[j]; this.deck[j] = tmp;
   }
 };
-ShuffledDeck.prototype.draw = function() {
+ShuffledDeck.prototype.draw = function () {
   if (this.deck.length === 0) this._refill();
   return this.deck.pop();
 };
 
-var deckAll  = null;
-var deckAI   = null;
+var deckAll = null;
+var deckAI = null;
 var deckReal = null;
 
 function resizeCanvas() {
@@ -92,12 +92,12 @@ function spawnFromPool(deck, xOverride) {
     : gameCanvas.width * (0.25 + Math.random() * 0.5);
   const y = gameCanvas.height + 60;
 
-  const targetX    = gameCanvas.width * (0.3 + Math.random() * 0.4);
+  const targetX = gameCanvas.width * (0.3 + Math.random() * 0.4);
   const peakHeight = gameCanvas.height * (0.1 + Math.random() * 0.4);
 
   const dy = peakHeight - y;
   const vy = -Math.sqrt(Math.abs(2 * GRAVITY * dy));
-  const t  = Math.abs(vy / GRAVITY);
+  const t = Math.abs(vy / GRAVITY);
   const vx = (targetX - x) / t;
 
   let rotSpeed = Math.random() * 0.008 + 0.003;
@@ -105,9 +105,9 @@ function spawnFromPool(deck, xOverride) {
 
   gameItems.push({
     image: proto.image,
-    type:  proto.type,
+    type: proto.type,
     x, y, vx, vy,
-    rotation:      Math.random() * Math.PI * 2,
+    rotation: Math.random() * Math.PI * 2,
     rotationSpeed: rotSpeed
   });
 }
@@ -118,9 +118,9 @@ function throwItem() {
 
 function throwPair() {
   if (!gameCanvas) return;
-  const leftX  = gameCanvas.width * (0.15 + Math.random() * 0.20);
+  const leftX = gameCanvas.width * (0.15 + Math.random() * 0.20);
   const rightX = gameCanvas.width * (0.65 + Math.random() * 0.20);
-  spawnFromPool(deckAI,   leftX);
+  spawnFromPool(deckAI, leftX);
   spawnFromPool(deckReal, rightX);
 }
 
@@ -128,7 +128,7 @@ function throwPair() {
 function getItemDims(img) {
   if (img.complete && img.naturalWidth > 0) {
     const maxDim = Math.round(window.innerWidth * 0.13);
-    const scale  = maxDim / Math.max(img.naturalWidth, img.naturalHeight);
+    const scale = maxDim / Math.max(img.naturalWidth, img.naturalHeight);
     return { w: img.naturalWidth * scale, h: img.naturalHeight * scale };
   }
   return { w: 160, h: 160 };
@@ -136,7 +136,7 @@ function getItemDims(img) {
 
 /* ── draw one image card (used for both live items and halves) ── */
 function drawCard(ctx, img, halfW, halfH) {
-  ctx.shadowBlur  = 15;
+  ctx.shadowBlur = 15;
   ctx.shadowColor = "rgba(0,0,0,0.35)";
   ctx.beginPath();
   ctx.roundRect(-halfW, -halfH, halfW * 2, halfH * 2, 5);
@@ -154,20 +154,20 @@ function drawCard(ctx, img, halfW, halfH) {
 
 /* ── collision: line segment vs rotated rectangle ── */
 function segSeg(ax, ay, bx, by, cx, cy, dx, dy) {
-  const d = (bx-ax)*(dy-cy) - (by-ay)*(dx-cx);
+  const d = (bx - ax) * (dy - cy) - (by - ay) * (dx - cx);
   if (d === 0) return false;
-  const t = ((cx-ax)*(dy-cy) - (cy-ay)*(dx-cx)) / d;
-  const u = ((cx-ax)*(by-ay) - (cy-ay)*(bx-ax)) / d;
+  const t = ((cx - ax) * (dy - cy) - (cy - ay) * (dx - cx)) / d;
+  const u = ((cx - ax) * (by - ay) - (cy - ay) * (bx - ax)) / d;
   return t >= 0 && t <= 1 && u >= 0 && u <= 1;
 }
 
 function lineHitsRotatedRect(x1, y1, x2, y2, cx, cy, rotation, halfW, halfH) {
   // Transform slash endpoints into item's local (unrotated) space
   const cos = Math.cos(-rotation), sin = Math.sin(-rotation);
-  const dx1 = x1-cx, dy1 = y1-cy;
-  const dx2 = x2-cx, dy2 = y2-cy;
-  const lx1 =  cos*dx1 - sin*dy1,  ly1 = sin*dx1 + cos*dy1;
-  const lx2 =  cos*dx2 - sin*dy2,  ly2 = sin*dx2 + cos*dy2;
+  const dx1 = x1 - cx, dy1 = y1 - cy;
+  const dx2 = x2 - cx, dy2 = y2 - cy;
+  const lx1 = cos * dx1 - sin * dy1, ly1 = sin * dx1 + cos * dy1;
+  const lx2 = cos * dx2 - sin * dy2, ly2 = sin * dx2 + cos * dy2;
 
   // Either endpoint inside the rect counts
   if (lx1 >= -halfW && lx1 <= halfW && ly1 >= -halfH && ly1 <= halfH) return true;
@@ -175,15 +175,15 @@ function lineHitsRotatedRect(x1, y1, x2, y2, cx, cy, rotation, halfW, halfH) {
 
   // Or the segment crosses any of the 4 edges
   const W = halfW, H = halfH;
-  return segSeg(lx1, ly1, lx2, ly2, -W, -H,  W, -H) ||  // top
-         segSeg(lx1, ly1, lx2, ly2,  W, -H,  W,  H) ||  // right
-         segSeg(lx1, ly1, lx2, ly2,  W,  H, -W,  H) ||  // bottom
-         segSeg(lx1, ly1, lx2, ly2, -W,  H, -W, -H);    // left
+  return segSeg(lx1, ly1, lx2, ly2, -W, -H, W, -H) ||  // top
+    segSeg(lx1, ly1, lx2, ly2, W, -H, W, H) ||  // right
+    segSeg(lx1, ly1, lx2, ly2, W, H, -W, H) ||  // bottom
+    segSeg(lx1, ly1, lx2, ly2, -W, H, -W, -H);    // left
 }
 
 /* ── slice an item into two falling halves ── */
 function sliceItem(item, idx, x1, y1, x2, y2) {
-  const dims  = getItemDims(item.image);
+  const dims = getItemDims(item.image);
   const halfW = dims.w / 2, halfH = dims.h / 2;
   const worldAngle = Math.atan2(y2 - y1, x2 - x1);
   // Store cut angle relative to item's current rotation so it tumbles with the piece
@@ -191,20 +191,20 @@ function sliceItem(item, idx, x1, y1, x2, y2) {
   const nx = Math.cos(worldAngle + Math.PI / 2);
   const ny = Math.sin(worldAngle + Math.PI / 2);
 
-  [-1, 1].forEach(function(side) {
+  [-1, 1].forEach(function (side) {
     slicedPieces.push({
-      image:         item.image,
-      x:             item.x,
-      y:             item.y,
-      vx:            item.vx + nx * side * 2,
-      vy:            item.vy + ny * side * 2 - 1.5,
-      rotation:      item.rotation,
+      image: item.image,
+      x: item.x,
+      y: item.y,
+      vx: item.vx + nx * side * 2,
+      vy: item.vy + ny * side * 2 - 1.5,
+      rotation: item.rotation,
       rotationSpeed: item.rotationSpeed + (Math.random() - 0.5) * 0.06,
-      localAngle:    localAngle,
-      side:          side,
-      alpha:         1.0,
-      halfW:         halfW,
-      halfH:         halfH
+      localAngle: localAngle,
+      side: side,
+      alpha: 1.0,
+      halfW: halfW,
+      halfH: halfH
     });
   });
 
@@ -212,37 +212,37 @@ function sliceItem(item, idx, x1, y1, x2, y2) {
   if (item.type === "SLOP") {
     slicedAI++;
     currentCombo++;
-    
+
     // Calculate score with combo multiplier
     // Base 100, plus 50 for each combo level above 1
     const pointsEarned = 100 + (currentCombo > 1 ? (currentCombo - 1) * 50 : 0);
     gameScore += pointsEarned;
-    
+
     // Play sword slash sound
     var slashAudio = document.getElementById("slash-sound");
     if (slashAudio) {
       slashAudio.currentTime = 0;
       slashAudio.volume = 0.15;
       slashAudio.playbackRate = 0.8;
-      slashAudio.play().catch(function(e){});
+      slashAudio.play().catch(function (e) { });
     }
 
     // Update and animate combo sticker
     if (currentCombo > 1) {
       const $sticker = $("#combo-sticker");
       $("#combo-count").text(currentCombo);
-      
+
       // Remove and re-add class to trigger CSS animation restart
       $sticker.removeClass("pop-in");
       void $sticker[0].offsetWidth; // trigger reflow
       $sticker.addClass("pop-in");
-      
+
       // Play combo sound with escalating pitch
       var comboAudio = document.getElementById("combo-sound");
       if (comboAudio) {
         comboAudio.currentTime = 0;
         comboAudio.playbackRate = Math.min(1 + (currentCombo * 0.05), 2.0);
-        comboAudio.play().catch(function(e){});
+        comboAudio.play().catch(function (e) { });
       }
     }
   } else {
@@ -266,18 +266,18 @@ function playErrorSound() {
     }
     var oscillator = audioCtx.createOscillator();
     var gainNode = audioCtx.createGain();
-    
+
     // A harsh, low-pitched sawtooth wave for an error buzz
     oscillator.type = 'sawtooth';
-    oscillator.frequency.setValueAtTime(120, audioCtx.currentTime); 
+    oscillator.frequency.setValueAtTime(120, audioCtx.currentTime);
     oscillator.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.2);
-    
+
     gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-    
+
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
-    
+
     oscillator.start();
     oscillator.stop(audioCtx.currentTime + 0.2);
   } catch (e) {
@@ -301,17 +301,17 @@ function checkSliceCollisions(x1, y1, x2, y2) {
 
 function gameLoop() {
   if (!gameCanvas || !gameCtx) return;
-  
+
   gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-  
+
   spawnTimer++;
-  
+
   const progress = Math.min(gameElapsedSeconds / gameMaxSeconds, 1.0);
 
-  // Dynamically accelerate game music from 0.8x to 1.2x
+  // Game music playback rate is kept at 1.0
   var gameMusic = document.getElementById("game-music");
   if (gameMusic) {
-    gameMusic.playbackRate = 0.8 + (progress * 0.4);
+    gameMusic.playbackRate = 1.0;
   }
 
   // Only spawn while the clock is still running
@@ -335,7 +335,7 @@ function gameLoop() {
       }
     }
   }
-  
+
   /* ── live items ── */
   for (let i = gameItems.length - 1; i >= 0; i--) {
     const item = gameItems[i];
@@ -343,12 +343,12 @@ function gameLoop() {
     item.x += item.vx;
     item.vy += GRAVITY;
     item.rotation += item.rotationSpeed;
-    
+
     if (item.y > gameCanvas.height + 200 && item.vy > 0) {
       gameItems.splice(i, 1);
       continue;
     }
-    
+
     const img = item.image;
     if (!img.complete || img.naturalWidth === 0) continue;
     const dims = getItemDims(img);
@@ -364,11 +364,11 @@ function gameLoop() {
   const LARGE = 3000;
   for (let i = slicedPieces.length - 1; i >= 0; i--) {
     const p = slicedPieces[i];
-    p.x  += p.vx;
-    p.y  += p.vy;
+    p.x += p.vx;
+    p.y += p.vy;
     p.vy += GRAVITY * 1.8;
-    p.rotation      += p.rotationSpeed;
-    p.alpha         -= 0.022;
+    p.rotation += p.rotationSpeed;
+    p.alpha -= 0.022;
 
     if (p.alpha <= 0 || p.y > gameCanvas.height + 300) {
       slicedPieces.splice(i, 1);
@@ -384,21 +384,21 @@ function gameLoop() {
     gameCtx.rotate(p.rotation);
 
     // Clip to one half of the cut (in local/rotated space)
-    const ca  = p.localAngle;
-    const lx  = Math.cos(ca), ly = Math.sin(ca);
-    const nx  = -ly * p.side, ny = lx * p.side;
+    const ca = p.localAngle;
+    const lx = Math.cos(ca), ly = Math.sin(ca);
+    const nx = -ly * p.side, ny = lx * p.side;
     gameCtx.beginPath();
-    gameCtx.moveTo(-lx * LARGE,             -ly * LARGE);
-    gameCtx.lineTo( lx * LARGE,              ly * LARGE);
-    gameCtx.lineTo( lx * LARGE + nx * LARGE, ly * LARGE + ny * LARGE);
-    gameCtx.lineTo(-lx * LARGE + nx * LARGE,-ly * LARGE + ny * LARGE);
+    gameCtx.moveTo(-lx * LARGE, -ly * LARGE);
+    gameCtx.lineTo(lx * LARGE, ly * LARGE);
+    gameCtx.lineTo(lx * LARGE + nx * LARGE, ly * LARGE + ny * LARGE);
+    gameCtx.lineTo(-lx * LARGE + nx * LARGE, -ly * LARGE + ny * LARGE);
     gameCtx.closePath();
     gameCtx.clip();
 
     drawCard(gameCtx, img, p.halfW, p.halfH);
     gameCtx.restore();
   }
-  
+
   gameAnimationFrame = requestAnimationFrame(gameLoop);
 }
 
@@ -441,12 +441,12 @@ function updateGameHud() {
 
 /* ─── slash renderer ─────────────────────────────────────── */
 
-var slashCanvas  = null;
-var slashCtx     = null;
-var slashRAF     = null;
+var slashCanvas = null;
+var slashCtx = null;
+var slashRAF = null;
 var slashDrawing = false;
-var slashPath    = [];          // { x, y, time }  — timestamped points
-var slashMouse   = { x: 0, y: 0 };
+var slashPath = [];          // { x, y, time }  — timestamped points
+var slashMouse = { x: 0, y: 0 };
 
 var TRAIL_MS = 190;             // how long (ms) each point lives
 
@@ -467,36 +467,36 @@ function buildPoly(pts, maxW) {
   if (pts.length < 2) return null;
   var total = 0, lens = [0];
   for (var i = 1; i < pts.length; i++) {
-    var dx = pts[i].x - pts[i-1].x, dy = pts[i].y - pts[i-1].y;
-    total += Math.sqrt(dx*dx + dy*dy);
+    var dx = pts[i].x - pts[i - 1].x, dy = pts[i].y - pts[i - 1].y;
+    total += Math.sqrt(dx * dx + dy * dy);
     lens.push(total);
   }
   if (total === 0) return null;
   var left = [], right = [];
   for (var i = 0; i < pts.length; i++) {
-    var t  = lens[i] / total;
-    var w  = Math.max(Math.sin(t * Math.PI) * maxW, maxW * 0.22);
+    var t = lens[i] / total;
+    var w = Math.max(Math.sin(t * Math.PI) * maxW, maxW * 0.22);
     var tx, ty;
-    if (i === 0)               { tx = pts[1].x   - pts[0].x;   ty = pts[1].y   - pts[0].y;   }
-    else if (i===pts.length-1) { tx = pts[i].x   - pts[i-1].x; ty = pts[i].y   - pts[i-1].y; }
-    else                       { tx = pts[i+1].x - pts[i-1].x; ty = pts[i+1].y - pts[i-1].y; }
-    var len = Math.sqrt(tx*tx + ty*ty) || 1;
+    if (i === 0) { tx = pts[1].x - pts[0].x; ty = pts[1].y - pts[0].y; }
+    else if (i === pts.length - 1) { tx = pts[i].x - pts[i - 1].x; ty = pts[i].y - pts[i - 1].y; }
+    else { tx = pts[i + 1].x - pts[i - 1].x; ty = pts[i + 1].y - pts[i - 1].y; }
+    var len = Math.sqrt(tx * tx + ty * ty) || 1;
     tx /= len; ty /= len;
-    left.push({ x: pts[i].x + (-ty)*w, y: pts[i].y + tx*w });
-    right.push({ x: pts[i].x - (-ty)*w, y: pts[i].y - tx*w });
+    left.push({ x: pts[i].x + (-ty) * w, y: pts[i].y + tx * w });
+    right.push({ x: pts[i].x - (-ty) * w, y: pts[i].y - tx * w });
   }
-  return { left:left, right:right, start:pts[0], end:pts[pts.length-1] };
+  return { left: left, right: right, start: pts[0], end: pts[pts.length - 1] };
 }
 
 function fillPoly(poly, r, g, b, alpha) {
   if (!poly) return;
   slashCtx.beginPath();
   slashCtx.moveTo(poly.start.x, poly.start.y);
-  for (var i=0;i<poly.left.length;i++)  slashCtx.lineTo(poly.left[i].x,  poly.left[i].y);
+  for (var i = 0; i < poly.left.length; i++)  slashCtx.lineTo(poly.left[i].x, poly.left[i].y);
   slashCtx.lineTo(poly.end.x, poly.end.y);
-  for (var i=poly.right.length-1;i>=0;i--) slashCtx.lineTo(poly.right[i].x, poly.right[i].y);
+  for (var i = poly.right.length - 1; i >= 0; i--) slashCtx.lineTo(poly.right[i].x, poly.right[i].y);
   slashCtx.closePath();
-  slashCtx.fillStyle = "rgba("+r+","+g+","+b+","+alpha+")";
+  slashCtx.fillStyle = "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
   slashCtx.fill();
 }
 
@@ -505,8 +505,8 @@ function drawTrail() {
   var pts = slashSimplify(slashPath);
   if (pts.length < 2) return;
   var blade = buildPoly(pts, 6);
-  var soft  = buildPoly(pts, 18);
-  fillPoly(soft,  210, 230, 255, 0.12);
+  var soft = buildPoly(pts, 18);
+  fillPoly(soft, 210, 230, 255, 0.12);
   fillPoly(blade, 255, 255, 255, 1.0);
 }
 
@@ -518,15 +518,15 @@ function drawCursorRing(x, y) {
 
   ctx.save();
   ctx.strokeStyle = "rgba(255,255,255,0.9)";
-  ctx.lineWidth   = 1.5;
-  ctx.lineCap     = "round";
+  ctx.lineWidth = 1.5;
+  ctx.lineCap = "round";
   ctx.shadowColor = "rgba(255,255,255,0.6)";
-  ctx.shadowBlur  = 6;
+  ctx.shadowBlur = 6;
 
   ctx.beginPath(); ctx.moveTo(x - arm - gap, y); ctx.lineTo(x - gap, y); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(x + gap, y);        ctx.lineTo(x + arm + gap, y); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(x, y - arm - gap);  ctx.lineTo(x, y - gap); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(x, y + gap);         ctx.lineTo(x, y + arm + gap); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x + gap, y); ctx.lineTo(x + arm + gap, y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x, y - arm - gap); ctx.lineTo(x, y - gap); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x, y + gap); ctx.lineTo(x, y + arm + gap); ctx.stroke();
 
   ctx.restore();
 }
@@ -535,9 +535,9 @@ function drawCursorRing(x, y) {
 function resizeSlashCanvas() {
   if (!slashCanvas) return;
   var dpr = window.devicePixelRatio || 1;
-  slashCanvas.width        = window.innerWidth  * dpr;
-  slashCanvas.height       = window.innerHeight * dpr;
-  slashCanvas.style.width  = window.innerWidth  + "px";
+  slashCanvas.width = window.innerWidth * dpr;
+  slashCanvas.height = window.innerHeight * dpr;
+  slashCanvas.style.width = window.innerWidth + "px";
   slashCanvas.style.height = window.innerHeight + "px";
   slashCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
@@ -567,7 +567,7 @@ function slashLoop() {
 
 /* ── event helpers ── */
 function getSlashPos(e) {
-  var r   = slashCanvas.getBoundingClientRect();
+  var r = slashCanvas.getBoundingClientRect();
   var src = e.touches ? e.touches[0] : e;
   return { x: src.clientX - r.left, y: src.clientY - r.top, time: Date.now() };
 }
@@ -575,7 +575,7 @@ function getSlashPos(e) {
 function onSlashMouseDown(e) {
   if (e.button !== 0) return;
   slashDrawing = true;
-  slashPath    = [getSlashPos(e)];
+  slashPath = [getSlashPos(e)];
   e.preventDefault();
 }
 function onSlashMouseMove(e) {
@@ -605,16 +605,16 @@ function initGameSlash() {
 
   slashCanvas = document.getElementById("slash-canvas");
   if (!slashCanvas) return;
-  slashCtx    = slashCanvas.getContext("2d");
+  slashCtx = slashCanvas.getContext("2d");
   slashDrawing = false;
-  slashPath    = [];
+  slashPath = [];
 
   resizeSlashCanvas();
   $(window).on("resize.slash", resizeSlashCanvas);
 
-  slashCanvas.addEventListener("mousedown",  onSlashMouseDown,  { passive: false });
-  slashCanvas.addEventListener("mousemove",  onSlashMouseMove,  { passive: false });
-  slashCanvas.addEventListener("mouseup",    onSlashMouseUp);
+  slashCanvas.addEventListener("mousedown", onSlashMouseDown, { passive: false });
+  slashCanvas.addEventListener("mousemove", onSlashMouseMove, { passive: false });
+  slashCanvas.addEventListener("mouseup", onSlashMouseUp);
   slashCanvas.addEventListener("mouseleave", onSlashMouseLeave);
 
   if (slashRAF) cancelAnimationFrame(slashRAF);
@@ -623,15 +623,15 @@ function initGameSlash() {
 
 function stopGameSlash() {
   slashDrawing = false;
-  slashPath    = [];
+  slashPath = [];
 
   if (slashRAF) { cancelAnimationFrame(slashRAF); slashRAF = null; }
   $(window).off("resize.slash");
 
   if (slashCanvas) {
-    slashCanvas.removeEventListener("mousedown",  onSlashMouseDown);
-    slashCanvas.removeEventListener("mousemove",  onSlashMouseMove);
-    slashCanvas.removeEventListener("mouseup",    onSlashMouseUp);
+    slashCanvas.removeEventListener("mousedown", onSlashMouseDown);
+    slashCanvas.removeEventListener("mousemove", onSlashMouseMove);
+    slashCanvas.removeEventListener("mouseup", onSlashMouseUp);
     slashCanvas.removeEventListener("mouseleave", onSlashMouseLeave);
   }
 
@@ -639,16 +639,16 @@ function stopGameSlash() {
     slashCtx.clearRect(0, 0, slashCanvas.width, slashCanvas.height);
 
   slashCanvas = null;
-  slashCtx    = null;
+  slashCtx = null;
 }
 
 /* ─── game init ──────────────────────────────────────────── */
 function initGame() {
   stopGameTimer();
-  
+
   var idle = document.getElementById("idle-music");
   if (idle) idle.pause();
-  
+
   gameCanvas = document.getElementById("game-canvas");
   if (gameCanvas) {
     gameCtx = gameCanvas.getContext("2d");
@@ -656,28 +656,28 @@ function initGame() {
     gameItems = [];
     slicedPieces = [];
     spawnTimer = 0;
-    deckAll  = new ShuffledDeck(ITEMS_POOL);
-    deckAI   = new ShuffledDeck(AI_POOL);
+    deckAll = new ShuffledDeck(ITEMS_POOL);
+    deckAI = new ShuffledDeck(AI_POOL);
     deckReal = new ShuffledDeck(REAL_POOL);
     gameLoop();
   }
 
   gameElapsedSeconds = 0;
-  gameScore          = 0;
-  slicedAI           = 0;
-  slicedReal         = 0;
-  currentCombo       = 0;
+  gameScore = 0;
+  slicedAI = 0;
+  slicedReal = 0;
+  currentCombo = 0;
   $("#combo-sticker").removeClass("pop-in");
   updateGameHud();
 
   var gameMusic = document.getElementById("game-music");
   if (gameMusic) {
     gameMusic.currentTime = 0;
-    gameMusic.playbackRate = 0.8;
+    gameMusic.playbackRate = 1.0;
     gameMusic.play().catch(e => console.error("Audio play error:", e));
   }
 
-  gameTimerInterval = setInterval(function() {
+  gameTimerInterval = setInterval(function () {
     gameElapsedSeconds += 1;
     updateGameHud();
 
@@ -694,7 +694,7 @@ function initGame() {
 
 function waitForClear() {
   // Poll every 200ms until all items and pieces are gone from the canvas
-  var poll = setInterval(function() {
+  var poll = setInterval(function () {
     var allGone = gameItems.length === 0 && slicedPieces.length === 0;
     if (allGone) {
       clearInterval(poll);
@@ -718,13 +718,13 @@ function showEndScreen() {
 
   document.getElementById("end-score-value").textContent = formatScore(gameScore);
   document.getElementById("end-highscore-value").textContent = formatScore(getHighScore());
-  document.getElementById("end-stat-ai").textContent   = slicedAI;
+  document.getElementById("end-stat-ai").textContent = slicedAI;
   document.getElementById("end-stat-real").textContent = slicedReal;
   el.classList.add("visible");
 
   // Restore Wii cursor for the end screen
   $("body").addClass("end-screen-open");
-  
+
   // Play idle sound in the end menu
   var idle = document.getElementById("idle-music");
   if (idle) {
