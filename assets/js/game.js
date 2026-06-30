@@ -28,19 +28,34 @@ const PHYSICS_SPEED_MULTIPLIER = 2.1;
 const SPAWN_SPEED_MULTIPLIER = 4.3;
 
 const aiImages = [
-  "blue-runner-shark 2.png", "cactus-elephant-clock 1.png", "frog-tire 1.png",
+  "6174ceea7d612c45ebeccc1026e66521.webp",
+  "669726e56b60d483ebfca9cc_6635609c8bc91f380db981ee_URAXIKYN_PvJ8_raw.jpeg",
+  "ai-animal-hybrid-image.png", "blue-runner-shark 2.png", "cactus-elephant-clock 1.png",
+  "frog-tire 1.png", "futuristic-half-robot-tiger_23-2151558824.avif", "gangaster-cat-7.webp",
   "image 1.png", "image 21.png", "image 22.png", "image 23.png", "image 24.png",
   "image 25.png", "image 27.png", "image 29.png", "image 30.png", "image 31.png",
   "image 32.png", "image 33.png", "image 34.png", "image 35.png", "image 36.png",
   "image 38.png", "image 39.png", "image 40.png", "image 41.png", "image 42.png",
-  "image 43.png", "image 44.png", "image 45.png", "image 5.png", "tree-figure 1.png"
+  "image 43.png", "image 44.png", "image 45.png", "image 5.png", "images (1).jpeg",
+  "images (2).jpeg", "images.jpeg", "olql786rnsvl.webp", "p0jkct29.jpg", "tree-figure 1.png"
 ];
 
 const realImages = [
-  "image 10.png", "image 11.png", "image 12.png", "image 13.png", "image 14.png",
-  "image 15.png", "image 16.png", "image 17.png", "image 18.png", "image 19.png",
-  "image 20.png", "image 46.png", "image 47.png", "image 48.png", "image 49.png",
-  "image 50.png", "image 6.png", "image 7.png", "image 8.png", "image 9.png"
+  "0001_AdobeStock_460169080.jpg", "AdobeStock_175375173_422894_reduced.jpg",
+  "GettyImages-200140069-001-572230963df78c5640ea71bf.jpg", "Wildlife_at_Maasai_Mara_(Lion).jpg",
+  "animal-and-their-babies-870x490 (1).webp", "animal-and-their-babies-870x490.webp",
+  "baby-animal-photos-65f9bc47971de.avif",
+  "closeup-scarlet-macaw-from-side-view-scarlet-macaw-closeup-head_488145-3540.avif",
+  "cute-wild-animals-2-686e3652d7b64__700.jpg", "fox-715588_640.jpg", "image 10.png",
+  "image 11.png", "image 12.png", "image 13.png", "image 14.png", "image 15.png",
+  "image 16.png", "image 17.png", "image 18.png", "image 19.png", "image 20.png",
+  "image 46.png", "image 47.png", "image 48.png", "image 49.png", "image 50.png",
+  "image 6.png", "image 7.png", "image 8.png", "image 9.png", "images (1).jpeg",
+  "images.jpeg", "istockphoto-1068395160-612x612.jpg",
+  "lamb-iStock-665494268-16x9-e1559777676675-1200x675.jpg",
+  "photo-1500479694472-551d1fb6258d.avif", "sand-cat-in-kuwait-desert-m.jpg",
+  "sloth-animal-on-tree-branch-and-looking-at-camera-photo.jpg",
+  "species-cat_f931wg_c_scale,w_1524.jpg"
 ];
 
 // Preload images right away
@@ -60,21 +75,25 @@ realImages.forEach(src => {
   REAL_POOL.push(entry);
 });
 
-/* ── Shuffled deck: draw every item once before repeating, never same order twice ── */
+/* ── Shuffled deck: every image appears once per cycle before any repeat ── */
 function ShuffledDeck(source) {
   this.source = source;
   this.deck = [];
   this.lastDrawn = null;
 }
-ShuffledDeck.prototype._refill = function () {
-  this.deck = this.source.slice();
-  // Fisher-Yates shuffle
-  for (let i = this.deck.length - 1; i > 0; i--) {
+ShuffledDeck.prototype._shuffle = function (arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    const tmp = this.deck[i]; this.deck[i] = this.deck[j]; this.deck[j] = tmp;
+    const tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
   }
+  return arr;
+};
+ShuffledDeck.prototype._refill = function () {
+  this.deck = this._shuffle(this.source.slice());
 
-  // Avoid drawing the same image twice in a row when starting a new cycle
+  // When a new cycle starts, avoid back-to-back identical images across cycles
   if (this.lastDrawn && this.deck.length > 1) {
     const lastSrc = this.lastDrawn.image.src;
     const top = this.deck.length - 1;
