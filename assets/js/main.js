@@ -7,6 +7,55 @@ var delay = ( function() {
     };
 })();
 
+// idle timer — returns to main menu after 1 minute of no interaction
+var idleTimer = null;
+var idleActive = false;
+var IDLE_TIMEOUT_MS = 60000;
+
+function idleReturnToMenu() {
+  idleActive = false;
+  clearTimeout(idleTimer);
+
+  // stop game if running
+  if (typeof stopGameTimer === "function") stopGameTimer();
+
+  // reset audio
+  ["idle-music", "game-music"].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.pause(); el.currentTime = 0; }
+  });
+  var bg = document.getElementById("bg-music");
+  if (bg) bg.play();
+
+  // remove splash classes
+  $(".main-menu").removeClass("channel-splash");
+  $("body").removeClass("channel-splash").addClass("splash-switch");
+  delay(function() { $("body").removeClass("splash-switch"); }, 900);
+
+  // navigate to menu
+  if (typeof changeView === "function") changeView("menu", "fade");
+}
+
+function resetIdleTimer() {
+  if (!idleActive) return;
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(idleReturnToMenu, IDLE_TIMEOUT_MS);
+}
+
+function startIdleTimer() {
+  idleActive = true;
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(idleReturnToMenu, IDLE_TIMEOUT_MS);
+}
+
+function stopIdleTimer() {
+  idleActive = false;
+  clearTimeout(idleTimer);
+}
+
+document.addEventListener("mousemove", resetIdleTimer, { passive: true });
+
+
 // UI audio
 function hover(){
 	var audio = document.getElementById("hover");
@@ -95,10 +144,12 @@ $( document ).ready(function() {
 		delay(function(){
 			$( "body" ).removeClass( "splash-switch" );
 		}, 900 );
+		startIdleTimer();
 	});
 
 	// back to main menu
 	$("body").on("click", ".menu-btn", function(){
+		stopIdleTimer();
 		$( ".main-menu" ).removeClass( "channel-splash" );
 		$( "body" ).removeClass( "channel-splash" );
 		$( "body" ).addClass( "splash-switch" );

@@ -49,6 +49,7 @@ function loadViewContents(v, t) {
           if (idle) idle.pause();
               var bg = document.getElementById("bg-music");
           if (bg) bg.pause();
+          if (typeof stopIdleTimer === "function") stopIdleTimer();
           initGame();
         }
 

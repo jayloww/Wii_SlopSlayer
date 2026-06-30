@@ -14,10 +14,14 @@ var gameItems = [];
 var slicedPieces = [];
 var gameAnimationFrame = null;
 var spawnTimer = 0;
+var lastGameFrameTime = null;
 var slicedAI = 0;
 var slicedReal = 0;
 var currentCombo = 0;
 const GRAVITY = 0.075;
+const FRAME_MS = 1000 / 60;
+const PHYSICS_SPEED_MULTIPLIER = 2;
+const SPAWN_SPEED_MULTIPLIER = 4;
 
 const aiImages = [
   "blue-runner-shark 2.png", "cactus-elephant-clock 1.png", "frog-tire 1.png",
@@ -299,12 +303,15 @@ function checkSliceCollisions(x1, y1, x2, y2) {
   }
 }
 
-function gameLoop() {
+function gameLoop(now) {
   if (!gameCanvas || !gameCtx) return;
 
-  gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+  if (lastGameFrameTime === null) lastGameFrameTime = now;
+  var deltaMs = Math.min(now - lastGameFrameTime, 50);
+  lastGameFrameTime = now;
+  var dt = (deltaMs / FRAME_MS) * PHYSICS_SPEED_MULTIPLIER;
 
-  spawnTimer++;
+  gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
   const progress = Math.min(gameElapsedSeconds / gameMaxSeconds, 1.0);
 
@@ -316,16 +323,14 @@ function gameLoop() {
 
   // Only spawn while the clock is still running
   if (gameElapsedSeconds < gameMaxSeconds) {
-    // Two-phase spawn rate (frames between throws):
-    //   0–38s : slow intro → steady ramp, 160 → 55 frames
-    //  38–45s : finale, 55 → 32 frames  (what used to be "mid" is now the peak)
-    let currentSpawnRate;
-    // Single linear ramp: one every ~6s at the start, one every ~1.5s at the end
-    currentSpawnRate = Math.floor(450 - 330 * progress);   // 450 → 120 (linear)
+    // Spawn cadence is derived from the old frame-based tuning at 60 FPS.
+    let currentSpawnRateFrames;
+    currentSpawnRateFrames = Math.floor(450 - 330 * progress);   // 450 → 120 frames
+    const currentSpawnRateMs = currentSpawnRateFrames * FRAME_MS;
 
-    spawnTimer++;
-    if (spawnTimer >= currentSpawnRate) {
-      spawnTimer = 0;
+    spawnTimer += deltaMs * SPAWN_SPEED_MULTIPLIER;
+    if (spawnTimer >= currentSpawnRateMs) {
+      spawnTimer -= currentSpawnRateMs;
       // Pair chance fades from 30% at the start to 0% at the last 10s (progress ~0.78)
       const pairChance = Math.max(0, 0.30 * (1 - progress / 0.78));
       if (Math.random() < pairChance) {
@@ -339,10 +344,10 @@ function gameLoop() {
   /* ── live items ── */
   for (let i = gameItems.length - 1; i >= 0; i--) {
     const item = gameItems[i];
-    item.y += item.vy;
-    item.x += item.vx;
-    item.vy += GRAVITY;
-    item.rotation += item.rotationSpeed;
+    item.y += item.vy * dt;
+    item.x += item.vx * dt;
+    item.vy += GRAVITY * dt;
+    item.rotation += item.rotationSpeed * dt;
 
     if (item.y > gameCanvas.height + 200 && item.vy > 0) {
       gameItems.splice(i, 1);
@@ -364,11 +369,11 @@ function gameLoop() {
   const LARGE = 3000;
   for (let i = slicedPieces.length - 1; i >= 0; i--) {
     const p = slicedPieces[i];
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vy += GRAVITY * 1.8;
-    p.rotation += p.rotationSpeed;
-    p.alpha -= 0.022;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.vy += GRAVITY * 1.8 * dt;
+    p.rotation += p.rotationSpeed * dt;
+    p.alpha -= 0.022 * dt;
 
     if (p.alpha <= 0 || p.y > gameCanvas.height + 300) {
       slicedPieces.splice(i, 1);
@@ -427,6 +432,7 @@ function stopGameTimer() {
     cancelAnimationFrame(gameAnimationFrame);
     gameAnimationFrame = null;
   }
+  lastGameFrameTime = null;
   var gameMusic = document.getElementById("game-music");
   if (gameMusic) gameMusic.pause();
   stopGameSlash();
@@ -656,10 +662,11 @@ function initGame() {
     gameItems = [];
     slicedPieces = [];
     spawnTimer = 0;
+    lastGameFrameTime = null;
     deckAll = new ShuffledDeck(ITEMS_POOL);
     deckAI = new ShuffledDeck(AI_POOL);
     deckReal = new ShuffledDeck(REAL_POOL);
-    gameLoop();
+    gameAnimationFrame = requestAnimationFrame(gameLoop);
   }
 
   gameElapsedSeconds = 0;
