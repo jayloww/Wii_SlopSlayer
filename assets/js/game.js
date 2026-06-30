@@ -965,7 +965,7 @@ function showEndScreen() {
   el.classList.add("visible");
 
   // Restore Wii cursor for the end screen
-  $("body").addClass("end-screen-open");
+  $("body").removeClass("in-game").addClass("end-screen-open");
 
   // Play idle sound in the end menu
   var idle = document.getElementById("idle-music");
@@ -983,7 +983,7 @@ function startGame() {
 
 function restartGame() {
   select();
-  $("body").removeClass("end-screen-open");
+  $("body").addClass("in-game").removeClass("end-screen-open");
   var el = document.getElementById("game-end-screen");
   if (el) el.classList.remove("visible");
   initGame();

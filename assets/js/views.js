@@ -50,11 +50,13 @@ function loadViewContents(v, t) {
               var bg = document.getElementById("bg-music");
           if (bg) bg.pause();
           if (typeof stopIdleTimer === "function") stopIdleTimer();
+          $("body").addClass("in-game").removeClass("end-screen-open");
           initGame();
         }
 
         if (v !== "game") {
           stopGameTimer();
+          $("body").removeClass("in-game end-screen-open");
         }
 
         currentView = v;

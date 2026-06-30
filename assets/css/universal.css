@@ -18,9 +18,13 @@ body, html {
   user-select: none;
 }
 
+body,
+body * {
+  cursor: url(../images/cursor.png), auto !important;
+}
+
 body {
   transition: 900ms;
-  cursor: url(../images/cursor.png), auto;
 }
 
 .black {
