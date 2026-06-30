@@ -19,10 +19,10 @@ var waitForClearPoll = null;
 var slicedAI = 0;
 var slicedReal = 0;
 var currentCombo = 0;
-const GRAVITY = 0.075;
+const GRAVITY = 0.082;
 const FRAME_MS = 1000 / 60;
-const PHYSICS_SPEED_MULTIPLIER = 2;
-const SPAWN_SPEED_MULTIPLIER = 4;
+const PHYSICS_SPEED_MULTIPLIER = 2.1;
+const SPAWN_SPEED_MULTIPLIER = 4.3;
 
 const aiImages = [
   "blue-runner-shark 2.png", "cactus-elephant-clock 1.png", "frog-tire 1.png",
@@ -351,7 +351,7 @@ function gameLoop(now) {
   if (gameElapsedSeconds < gameMaxSeconds) {
     // Spawn cadence is derived from the old frame-based tuning at 60 FPS.
     let currentSpawnRateFrames;
-    currentSpawnRateFrames = Math.floor(450 - 330 * progress);   // 450 → 120 frames
+    currentSpawnRateFrames = Math.floor(420 - 315 * progress);   // 420 → 105 frames
     const currentSpawnRateMs = currentSpawnRateFrames * FRAME_MS;
 
     spawnTimer += deltaMs * SPAWN_SPEED_MULTIPLIER;
@@ -448,10 +448,19 @@ function formatScore(v) {
 }
 function getHighScore() {
   var s = localStorage.getItem("wii-game-highscore");
-  return s ? parseInt(s, 10) : 8750;
+  return s ? parseInt(s, 10) : 0;
 }
 function setHighScore(v) {
   localStorage.setItem("wii-game-highscore", v);
+}
+function resetHighScore() {
+  localStorage.removeItem("wii-game-highscore");
+}
+
+// One-time reset of previously saved high scores
+if (!localStorage.getItem("wii-highscore-reset")) {
+  resetHighScore();
+  localStorage.setItem("wii-highscore-reset", "1");
 }
 function stopGameTimer() {
   if (gameTimerInterval) {
