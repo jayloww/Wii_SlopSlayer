@@ -9,9 +9,8 @@ body.channel-splash {
   transition: transform 900ms, opacity 400ms, background-color 900ms, visibility 900ms;
   opacity: 1;
   visibility: visible;
-  background-image: url(../images/4K_PinkCloud_BackgroundImage1.png);
-  background-size: cover;
-  background-position: center;
+  background-image: url(../images/bg-pattern.png);
+  background-color: lightgrey;
   width: 100%;
   height: 100vh;
 }
