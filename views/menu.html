@@ -3,10 +3,10 @@
     <div class="channels">
       <div class="col first">
         <div class="channel-icon occupied"><img src="assets/images/StartScreenImage.png">
-          <div class="hover" id="1" onmouseover="hover()" onclick="zip()" data-img="assets/images/StartScreenImage.png"></div>
+          <div class="hover" id="1" onmouseover="hover()" onclick="zip()" data-img="assets/images/StartScreenImage.png" data-start-func="startGame" data-start-text="Start"></div>
         </div>
-        <div class="channel-icon blank">
-          <div class="hover" id="2"></div>
+        <div class="channel-icon occupied"><img src="assets/images/PresentationCover.png" id="presentation-cover" onerror="this.src='assets/images/StartScreenImage.png'">
+          <div class="hover" id="2" onmouseover="hover()" onclick="zip()" data-img="assets/images/PresentationCover.png" data-start-func="startPresentation" data-start-text="Start Presentation"></div>
         </div>
         <div class="channel-icon blank">
           <div class="hover" id="3"></div>

@@ -130,7 +130,7 @@ setInterval(updateDateTime, 1000);
 
 $( document ).ready(function() {
   $(window).on("resize", fitChannelGrid);
-  // go to main menu when channel is clicked
+  	// go to main menu when channel is clicked
 	$("body").on("click", ".occupied .hover", function(){
 		var centerX = $(this).offset().left + $(this).width() / 2;
 		var centerY = $(this).offset().top + $(this).height() / 2;
@@ -138,6 +138,11 @@ $( document ).ready(function() {
 
     var img = $( this ).attr( "data-img" );
 		$( ".splash-screen" ).css( {"background-image" : " url(" + img + ")", "transform-origin" : centerX + "px " + centerY + "px 0px"} );
+
+		// Update splash start button
+		var startFunc = $(this).attr("data-start-func") || "startGame";
+		var startText = $(this).attr("data-start-text") || "Start";
+		$(".start-btn").attr("onclick", startFunc + "()").text(startText);
 
 		$( ".main-menu" ).addClass( "channel-splash" );
 		$( "body" ).addClass( "channel-splash" );
@@ -163,3 +168,9 @@ $( document ).ready(function() {
 		$( ".screen-message" ).addClass( "hidden" );
 	});
 });
+
+function startPresentation() {
+  select();
+  previousView = currentView || "menu";
+  changeView("presentation", "fade");
+}
