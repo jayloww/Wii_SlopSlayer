@@ -6,7 +6,8 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: #f0f0f0;
+  background: url('../images/4K_PinkCloud_BackgroundImage1.png') no-repeat center center;
+  background-size: cover;
   font-family: 'Asap', sans-serif;
   z-index: 10;
 }
@@ -21,10 +22,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: transparent;
   visibility: hidden;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .pres-slide.active {
@@ -33,68 +34,285 @@
   z-index: 2;
 }
 
-.pres-content {
-  text-align: center;
-  width: 80%;
+/* Glassmorphism Card Style */
+.glass-card {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(20px) saturate(130%);
+  -webkit-backdrop-filter: blur(20px) saturate(130%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 24px;
+  padding: 4vh 4vw;
+  box-shadow: 0 12px 40px rgba(255, 0, 127, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
   max-width: 900px;
+  width: 85%;
+  margin: 0 auto;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 48px rgba(255, 0, 127, 0.15), 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
 .pres-content h1 {
-  font-size: 5vw;
-  color: #333;
+  font-size: 3.5vw;
+  color: #2c001e;
+  margin-top: 0;
   margin-bottom: 2vh;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
 }
 
 .pres-content p {
-  font-size: 2.2vw;
-  color: #555;
-  margin-bottom: 4vh;
+  font-size: 1.6vw;
+  color: #4a3b45;
+  line-height: 1.5;
+  margin-bottom: 3vh;
 }
 
-.pres-image-placeholder {
-  width: 60%;
-  height: 35vh;
-  margin: 0 auto;
-  border: 4px dashed #ccc;
-  border-radius: 10px;
-  background: #fafafa;
+.pres-subtitle {
+  font-weight: 500;
+  font-size: 1.8vw;
+}
+
+/* Visual Components instead of Placeholders */
+.pres-visual {
+  margin: 2vh auto 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5vw;
-  color: #999;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Slide 0: Nostalgie */
+.nostalgia-visual {
+  max-width: 450px;
+  border: 8px solid #fff;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  background: #000;
+}
+.retro-tv-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.retro-badge {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: #ff007f;
+  color: #fff;
+  font-size: 1.1vw;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(255, 0, 127, 0.3);
+}
+
+/* Slide 1: AI Stack Infiltration */
+.slop-infiltration-visual {
+  height: 25vh;
+  width: 100%;
+  overflow: visible;
+}
+.image-stack {
+  position: relative;
+  width: 200px;
+  height: 150px;
+  margin: 0 auto;
+}
+.slop-stack-img {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border: 6px solid #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease;
+}
+.slop-1 {
+  transform: rotate(-12deg) translate(-40px, 0);
+  z-index: 1;
+}
+.slop-2 {
+  transform: rotate(8deg) translate(40px, 10px);
+  z-index: 2;
+}
+.slop-3 {
+  transform: rotate(-2deg) translate(0px, -5px);
+  z-index: 3;
+}
+.slop-infiltration-visual:hover .slop-1 {
+  transform: rotate(-18deg) translate(-65px, -10px);
+}
+.slop-infiltration-visual:hover .slop-2 {
+  transform: rotate(14deg) translate(65px, 20px);
+}
+.slop-infiltration-visual:hover .slop-3 {
+  transform: scale(1.1) rotate(0deg) translate(0px, -15px);
+}
+
+/* Slide 2: Active Slice */
+.active-slice-visual {
+  height: 25vh;
+  width: 100%;
+}
+.sliced-image-container {
+  position: relative;
+  width: 220px;
+  height: 160px;
+  margin: 0 auto;
+  overflow: visible;
+}
+.sliced-half {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.sliced-half img {
+  width: 220px;
+  height: 160px;
+  object-fit: cover;
+  border: 6px solid #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  display: block;
+}
+.left-half {
+  clip-path: polygon(0 0, 80% 0, 20% 100%, 0 100%);
+  transform: translate(-10px, -5px) rotate(-3deg);
+}
+.right-half {
+  clip-path: polygon(80% 0, 100% 0, 100% 100%, 20% 100%);
+  transform: translate(10px, 5px) rotate(3deg);
+}
+.sliced-image-container:hover .left-half {
+  transform: translate(-25px, -15px) rotate(-8deg);
+}
+.sliced-image-container:hover .right-half {
+  transform: translate(25px, 15px) rotate(8deg);
+}
+.slash-line-indicator {
+  position: absolute;
+  top: -10%;
+  left: 20%;
+  width: 60%;
+  height: 120%;
+  border-left: 3px dashed #ff007f;
+  transform: rotate(70deg);
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* Slide 3: Overwhelming Grid */
+.overwhelming-visual {
+  width: 100%;
+  height: 25vh;
+}
+.grid-overwhelmed {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.grid-img {
+  width: 100%;
+  height: 12vh;
+  object-fit: cover;
+  border: 4px solid #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+.grid-img:nth-child(even) {
+  transform: rotate(5deg);
+}
+.grid-img:nth-child(odd) {
+  transform: rotate(-5deg);
+}
+.grid-overwhelmed:hover .grid-img {
+  transform: scale(1.1) rotate(0deg);
+  box-shadow: 0 8px 18px rgba(255, 0, 127, 0.2);
+}
+
+/* Slide 4: Real vs AI Compare */
+.compare-visual {
+  width: 100%;
+  height: 26vh;
+}
+.compare-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+.compare-card {
+  position: relative;
+  width: 160px;
+  border: 6px solid #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  overflow: visible;
+  transition: transform 0.3s ease;
+}
+.compare-card img {
+  width: 100%;
+  height: 15vh;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block;
+}
+.badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.9vw;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  white-space: nowrap;
+}
+.real-badge {
+  background: #28a745;
+}
+.ai-badge {
+  background: #ff007f;
+}
+.compare-card:hover {
+  transform: scale(1.08) translateY(-5px);
 }
 
 /* UI overlay */
 .pres-ui {
   position: absolute;
-  bottom: 0;
+  bottom: 5vh;
   left: 0;
   width: 100%;
-  height: 15vh;
   display: flex;
-  flex-direction: row;
-  align-items: center;
   justify-content: center;
   z-index: 20;
   pointer-events: none; /* Let swipes pass through */
 }
 
-.pres-hint {
-  position: absolute;
-  right: 3vw;
-  top: 50%;
-  transform: translateY(-50%);
-  font-family: 'Arial', sans-serif;
-  font-size: 1.2vw;
-  color: rgba(0, 0, 0, 0.4);
-}
-
 .pres-controls {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 2vw;
+  width: 90%;
+  max-width: 1000px;
   pointer-events: auto; /* Buttons are clickable */
 }
 
@@ -129,38 +347,61 @@
   transform: scale(0.95);
 }
 
-/* Slicing Animation Classes */
+/* Complex 3D Slicing Animation Classes */
 .slice-layer {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: white;
+  background: transparent;
   z-index: 5;
   pointer-events: none;
+  perspective: 1000px;
 }
 
 .slice-half-1 {
-  clip-path: polygon(0 0, 100% 0, 0 100%);
-  animation: sliceUpLeft 1s forwards cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-shadow: 2px 2px 15px rgba(0,0,0,0.2);
+  clip-path: polygon(0 0, 110% 0, 0 100%);
+  animation: sliceUpLeft 0.8s cubic-bezier(0.1, 1, 0.2, 1) forwards;
 }
 
 .slice-half-2 {
-  clip-path: polygon(100% 0, 100% 100%, 0 100%);
-  animation: sliceDownRight 1s forwards cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-shadow: -2px -2px 15px rgba(0,0,0,0.2);
+  clip-path: polygon(110% 0, 100% 100%, 0 100%);
+  animation: sliceDownRight 0.8s cubic-bezier(0.1, 1, 0.2, 1) forwards;
 }
 
 @keyframes sliceUpLeft {
-  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
-  100% { transform: translate(-20vw, -20vh) rotate(-10deg); opacity: 0; }
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+  20% {
+    transform: translate3d(-4vw, -2vh, 15px) rotate(-1.5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-35vw, -20vh, -120px) rotate(-18deg);
+    opacity: 0;
+    filter: blur(10px);
+  }
 }
 
 @keyframes sliceDownRight {
-  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
-  100% { transform: translate(20vw, 20vh) rotate(10deg); opacity: 0; }
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+  20% {
+    transform: translate3d(4vw, 2vh, 15px) rotate(1.5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(35vw, 35vh, -120px) rotate(18deg);
+    opacity: 0;
+    filter: blur(10px);
+  }
 }
 
 /* The invisible touch area to detect swipes */
@@ -169,7 +410,40 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 85vh; /* leave bottom for buttons */
+  height: 80vh; /* leave bottom for buttons */
   z-index: 15;
   cursor: crosshair;
+}
+
+/* Glowing Slash Trail */
+.slash-trail {
+  position: absolute;
+  height: 8px;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 20%, rgba(255,0,127,1) 50%, rgba(255,255,255,1) 80%, rgba(255,255,255,0) 100%);
+  box-shadow: 0 0 20px #ff007f, 0 0 8px #ffffff;
+  border-radius: 4px;
+  transform-origin: left center;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 1;
+  transition: transform 0.4s cubic-bezier(0.1, 0.8, 0.3, 1), opacity 0.4s ease-out;
+}
+
+/* Spark Particle Effects */
+.pres-spark {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #ff007f;
+  box-shadow: 0 0 10px #ff007f, 0 0 4px #fff;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99;
+  transform: translate3d(0, 0, 0) scale(1);
+  opacity: 1;
+  transition: transform 0.8s cubic-bezier(0.1, 0.8, 0.2, 1), opacity 0.8s ease-out;
+}
+.pres-spark.fly {
+  transform: translate3d(var(--vx), var(--vy), 0) scale(0.1);
+  opacity: 0;
 }

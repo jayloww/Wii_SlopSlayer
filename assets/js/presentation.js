@@ -30,8 +30,14 @@ function updateSlides() {
 function nextSlide() {
   select(); // play select audio
   if (currentSlideIndex < totalSlides - 1) {
-    currentSlideIndex++;
-    updateSlides();
+    // Generate mock diagonal cut coordinates for button press
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const sx = width * 0.8;
+    const sy = height * 0.2;
+    const ex = width * 0.2;
+    const ey = height * 0.8;
+    sliceToNextSlide(sx, sy, ex, ey);
   } else {
     exitPresentation(); // Exit if last slide
   }
@@ -45,19 +51,95 @@ function prevSlide() {
   }
 }
 
+// Spark/Particle Generator
+function createSparks(sx, sy, ex, ey) {
+  const container = document.getElementById('presentation-container');
+  if (!container) return;
+
+  const numSparks = 25;
+  const dx = ex - sx;
+  const dy = ey - sy;
+
+  for (let i = 0; i < numSparks; i++) {
+    const pct = i / (numSparks - 1);
+    const x = sx + dx * pct;
+    const y = sy + dy * pct;
+
+    const spark = document.createElement('div');
+    spark.className = 'pres-spark';
+    container.appendChild(spark);
+
+    spark.style.left = `${x}px`;
+    spark.style.top = `${y}px`;
+
+    // Random direction and velocity
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 100 + Math.random() * 250; // px/sec
+    const vx = Math.cos(angle) * speed;
+    const vy = Math.sin(angle) * speed;
+
+    spark.style.setProperty('--vx', `${vx}px`);
+    spark.style.setProperty('--vy', `${vy}px`);
+
+    // Reflow and fly
+    spark.offsetHeight;
+    spark.classList.add('fly');
+
+    setTimeout(() => {
+      if (container.contains(spark)) container.removeChild(spark);
+    }, 800);
+  }
+}
+
+// Glowing Sword-Slash Trail
+function createSlashTrail(sx, sy, ex, ey) {
+  const container = document.getElementById('presentation-container');
+  if (!container) return;
+
+  const dx = ex - sx;
+  const dy = ey - sy;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+  const angle = Math.atan2(dy, dx);
+
+  const trail = document.createElement('div');
+  trail.className = 'slash-trail';
+  container.appendChild(trail);
+
+  trail.style.width = `${distance}px`;
+  trail.style.left = `${sx}px`;
+  trail.style.top = `${sy}px`;
+  trail.style.transform = `rotate(${angle}rad) scaleY(1)`;
+
+  // Reflow and animate transition
+  trail.offsetHeight;
+  trail.style.opacity = '0';
+  trail.style.transform = `rotate(${angle}rad) scaleY(0)`;
+
+  setTimeout(() => {
+    if (container.contains(trail)) container.removeChild(trail);
+  }, 400);
+}
+
 // Slice animation logic
-function sliceToNextSlide() {
+function sliceToNextSlide(sx, sy, ex, ey) {
   if (currentSlideIndex >= totalSlides - 1) {
     exitPresentation();
     return;
   }
 
-  // Play slash sound if available
-  const slashAudio = document.getElementById("slash-sound");
-  if (slashAudio) {
-    slashAudio.currentTime = 0;
-    slashAudio.play();
+  // Ensure coordinate fallback if called without parameters
+  if (sx === undefined || sy === undefined || ex === undefined || ey === undefined) {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    sx = width * 0.8;
+    sy = height * 0.2;
+    ex = width * 0.2;
+    ey = height * 0.8;
   }
+
+  // Create visual slice FX (glowing trail & spark burst)
+  createSlashTrail(sx, sy, ex, ey);
+  createSparks(sx, sy, ex, ey);
 
   const container = document.getElementById('presentation-container');
   const currentSlide = document.getElementById('pres-slide-' + currentSlideIndex);
@@ -80,7 +162,7 @@ function sliceToNextSlide() {
 
   // Hide original slide and go to next
   currentSlide.classList.remove('active');
-  currentSlide.style.visibility = 'hidden'; // Ensure it's hidden immediately beneath clones
+  currentSlide.style.visibility = 'hidden'; 
   
   currentSlideIndex++;
   const nextSlideEl = document.getElementById('pres-slide-' + currentSlideIndex);
@@ -98,7 +180,6 @@ function sliceToNextSlide() {
 
 // Swipe detection logic
 function setupSwipeZone() {
-  // We attach to document body but only act if in presentation mode
   if (window.presSwipeInitialized) return;
   window.presSwipeInitialized = true;
 
@@ -142,9 +223,9 @@ function handleSwipeEnd(e) {
   const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
   const duration = endTime - startTime;
 
-  // If the swipe was fast and long enough, trigger slice
+  // If the swipe was fast and long enough, trigger slice with exact coordinates
   // Threshold: distance > 150px and duration < 500ms
   if (distance > 150 && duration < 500) {
-    sliceToNextSlide();
+    sliceToNextSlide(startX, startY, endX, endY);
   }
 }
