@@ -1,32 +1,121 @@
+let currentSlideIndex = 0;
+const totalSlides = 5;
+
 // Variables for slice detection
 let isSwiping = false;
 let startX, startY;
 let startTime;
 
+// Background animation variables
+let bgAnimationInterval;
+const aiImageAssets = [
+  'cactus-elephant-clock 1.png',
+  'frog-tire 1.png',
+  'tree-figure 1.png',
+  'image 21.png',
+  'image 22.png',
+  'image 23.png',
+  'image 24.png',
+  'image 25.png',
+  'image 27.png',
+  'image 29.png',
+  'image 31.png'
+];
+
 // Reset presentation state when loading
 function initPresentation() {
-  if (typeof Reveal !== 'undefined') {
-    Reveal.initialize({
-      controls: false,
-      progress: true,
-      transition: 'none', // We use our own slice animation over the slide change
-      keyboard: false,
-      touch: false, // We use custom swipe logic
-      embedded: true, // Crucial for embedding in the #presentation-container
-      hash: false,
-      center: true
-    }).then(() => {
-      Reveal.sync();
-      Reveal.slide(0);
-    });
-  }
-  
+  currentSlideIndex = 0;
+  updateSlides();
   setupSwipeZone();
+  startBackgroundLoop();
+}
+
+// Clean up background loop if exiting
+function stopBackgroundLoop() {
+  if (bgAnimationInterval) {
+    clearInterval(bgAnimationInterval);
+    bgAnimationInterval = null;
+  }
+}
+
+function startBackgroundLoop() {
+  stopBackgroundLoop(); // Ensure no duplicates
+  // Spawn an image every 2.5 seconds
+  bgAnimationInterval = setInterval(spawnFlyingImage, 2500);
+  // Spawn a few immediately
+  for(let i=0; i<3; i++) {
+    setTimeout(spawnFlyingImage, i * 500);
+  }
+}
+
+function spawnFlyingImage() {
+  const container = document.getElementById('bg-flying-images');
+  if (!container || currentView !== "presentation") {
+    stopBackgroundLoop();
+    return;
+  }
+
+  const img = document.createElement('img');
+  const randomImage = aiImageAssets[Math.floor(Math.random() * aiImageAssets.length)];
+  img.src = `assets/images/AI/${randomImage}`;
+  img.className = 'flying-bg-img';
+  
+  // Random start position (usually offscreen right or bottom)
+  const startX = window.innerWidth + 100;
+  const startY = Math.random() * window.innerHeight;
+  
+  // Random end position (offscreen left)
+  const endX = -200;
+  const endY = startY + (Math.random() * 400 - 200);
+
+  img.style.left = startX + 'px';
+  img.style.top = startY + 'px';
+  
+  // Random size and rotation
+  const scale = 0.5 + Math.random() * 0.8;
+  const startRot = Math.random() * 360;
+  const endRot = startRot + (Math.random() * 360 - 180);
+
+  img.style.transform = `scale(${scale}) rotate(${startRot}deg)`;
+  
+  container.appendChild(img);
+
+  // Animate using Web Animations API
+  const duration = 8000 + Math.random() * 6000;
+  
+  const animation = img.animate([
+    { transform: `translate(0, 0) scale(${scale}) rotate(${startRot}deg)` },
+    { transform: `translate(${endX - startX}px, ${endY - startY}px) scale(${scale}) rotate(${endRot}deg)` }
+  ], {
+    duration: duration,
+    easing: 'linear',
+    fill: 'forwards'
+  });
+
+  animation.onfinish = () => {
+    if (container.contains(img)) {
+      container.removeChild(img);
+    }
+  };
+}
+
+
+function updateSlides() {
+  const slides = document.querySelectorAll('.pres-slide');
+  if (!slides || slides.length === 0) return;
+
+  slides.forEach((slide, index) => {
+    if (index === currentSlideIndex) {
+      slide.classList.add('active');
+    } else {
+      slide.classList.remove('active');
+    }
+  });
 }
 
 function nextSlide() {
   select(); // play select audio
-  if (typeof Reveal !== 'undefined' && !Reveal.isLastSlide()) {
+  if (currentSlideIndex < totalSlides - 1) {
     // Generate mock diagonal cut coordinates for button press
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -36,14 +125,16 @@ function nextSlide() {
     const ey = height * 0.8;
     sliceToNextSlide(sx, sy, ex, ey);
   } else {
+    stopBackgroundLoop();
     exitPresentation(); // Exit if last slide
   }
 }
 
 function prevSlide() {
   select(); // play select audio
-  if (typeof Reveal !== 'undefined' && !Reveal.isFirstSlide()) {
-    Reveal.prev();
+  if (currentSlideIndex > 0) {
+    currentSlideIndex--;
+    updateSlides();
   }
 }
 
@@ -163,9 +254,10 @@ function createSlashTrail(sx, sy, ex, ey) {
   }, 400);
 }
 
-// Slice animation logic interacting with Reveal.js
+// Custom Slice animation logic
 function sliceToNextSlide(sx, sy, ex, ey) {
-  if (typeof Reveal === 'undefined' || Reveal.isLastSlide()) {
+  if (currentSlideIndex >= totalSlides - 1) {
+    stopBackgroundLoop();
     exitPresentation();
     return;
   }
@@ -192,15 +284,21 @@ function sliceToNextSlide(sx, sy, ex, ey) {
   createSparksCanvas(sx, sy, ex, ey);
 
   const container = document.getElementById('presentation-container');
-  const revealNode = document.querySelector('.reveal');
+  const currentSlide = document.getElementById('pres-slide-' + currentSlideIndex);
   
-  if (!revealNode || !container) return;
+  if (!currentSlide || !container) return;
 
-  // Clone current reveal state twice for the two halves
-  const clone1 = revealNode.cloneNode(true);
-  const clone2 = revealNode.cloneNode(true);
+  // Clone current slide twice for the two halves
+  const clone1 = currentSlide.cloneNode(true);
+  const clone2 = currentSlide.cloneNode(true);
 
-  // Wrappers to apply the slice animations
+  clone1.id = '';
+  clone2.id = '';
+  
+  clone1.classList.remove('active');
+  clone2.classList.remove('active');
+
+  // Wrappers to apply the slice animations over the background
   const wrapper1 = document.createElement('div');
   wrapper1.className = 'slice-layer slice-half-1';
   wrapper1.appendChild(clone1);
@@ -213,14 +311,15 @@ function sliceToNextSlide(sx, sy, ex, ey) {
   container.appendChild(wrapper1);
   container.appendChild(wrapper2);
 
-  // Go to next slide instantly (Reveal handles this behind the clones because transition: 'none')
-  Reveal.next();
+  // Update slide index and switch active class
+  currentSlideIndex++;
+  updateSlides();
 
   // Clean up clones after animation
   setTimeout(() => {
     if (container.contains(wrapper1)) container.removeChild(wrapper1);
     if (container.contains(wrapper2)) container.removeChild(wrapper2);
-  }, 1000);
+  }, 800);
 }
 
 // Swipe detection logic

@@ -1,4 +1,4 @@
-/* Presentation Channel Styles - Modern Split Layout */
+/* Presentation Channel Styles - Slop Slayer Custom Engine */
 
 .presentation-wrapper {
   position: absolute;
@@ -7,26 +7,58 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  /* Background applied ONLY here, so it doesn't move during slice */
   background: url('../images/4K_PinkCloud_BackgroundImage1.png') no-repeat center center;
   background-size: cover;
   font-family: 'Asap', sans-serif;
   z-index: 10;
 }
 
-/* Reveal structure */
-.reveal {
-  width: 100%;
-  height: 100%;
+/* Dynamic Background container */
+#bg-flying-images {
   position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
   z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
 }
 
-/* Dark overlay for contrast if needed, or just let Reveal be transparent */
-.reveal .slides {
-  /* We don't want backgrounds here so the slice looks clean */
+.flying-bg-img {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  opacity: 0.8;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  /* Animation is applied via JS */
+  will-change: transform;
+}
+
+/* Custom Slide Engine */
+.pres-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 2;
+}
+
+.pres-slide.active {
+  visibility: visible;
+  opacity: 1;
+  z-index: 5;
 }
 
 /* Split Layout */
@@ -34,39 +66,35 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 60px;
+  gap: 80px;
   width: 90vw;
-  max-width: 1200px;
+  max-width: 1400px;
   height: 70vh;
   margin: 0 auto;
 }
 
-.split-visual {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
-
+/* Transparency on text cards */
 .split-text {
   flex: 1;
   text-align: left;
-  background: rgba(255, 255, 255, 0.85); /* Semi-transparent white box for readability */
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.7); /* Transparent white */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 50px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255,255,255,0.8);
 }
 
 .split-text h1 {
-  font-size: 52px;
+  font-size: 58px;
   color: #111;
   margin-top: 0;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
   font-weight: 700;
   text-transform: none;
   font-family: 'Asap', sans-serif;
-  border-bottom: 3px solid #ff007f; /* Use the pink from the game as highlight */
+  border-bottom: 4px solid #00aaff;
   padding-bottom: 15px;
 }
 
@@ -77,12 +105,12 @@
 }
 
 .split-text li {
-  font-size: 28px;
+  font-size: 32px;
   color: #333;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   line-height: 1.4;
   position: relative;
-  padding-left: 30px;
+  padding-left: 35px;
 }
 
 .split-text li::before {
@@ -90,8 +118,16 @@
   position: absolute;
   left: 0;
   top: 4px;
-  color: #ff007f;
-  font-size: 20px;
+  color: #00aaff;
+  font-size: 24px;
+}
+
+.split-visual {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
 }
 
 /* Visual Components */
@@ -99,9 +135,10 @@
 /* Slide 0: Nostalgie */
 .main-img {
   width: 100%;
-  max-width: 500px;
-  border-radius: 12px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  max-width: 600px;
+  border-radius: 16px;
+  box-shadow: 0 15px 45px rgba(0,0,0,0.25);
+  border: 6px solid #fff;
 }
 
 /* Slide 1: AI Stack Infiltration */
@@ -111,22 +148,22 @@
 }
 .image-stack {
   position: relative;
-  width: 300px;
-  height: 300px;
+  width: 350px;
+  height: 350px;
   margin: 0 auto;
 }
 .slop-stack-img {
   position: absolute;
-  width: 200px;
-  height: 200px;
+  width: 250px;
+  height: 250px;
   object-fit: cover;
-  border: 4px solid #fff;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  border: 6px solid #fff;
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.25);
 }
-.slop-1 { transform: rotate(-10deg) translate(-40px, -20px); z-index: 1; }
-.slop-2 { transform: rotate(8deg) translate(60px, 30px); z-index: 2; }
-.slop-3 { transform: rotate(-2deg) translate(10px, 5px); z-index: 3; }
+.slop-1 { transform: rotate(-12deg) translate(-50px, -20px); z-index: 1; }
+.slop-2 { transform: rotate(10deg) translate(80px, 40px); z-index: 2; }
+.slop-3 { transform: rotate(-4deg) translate(10px, 5px); z-index: 3; }
 
 /* Slide 2: Active Slice */
 .active-slice-visual {
@@ -135,8 +172,8 @@
 }
 .sliced-image-container {
   position: relative;
-  width: 340px;
-  height: 240px;
+  width: 400px;
+  height: 300px;
   margin: 0 auto;
 }
 .sliced-half {
@@ -148,18 +185,18 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border: 4px solid #fff;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  border: 6px solid #fff;
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.25);
   display: block;
 }
 .left-half {
   clip-path: polygon(0 0, 80% 0, 20% 100%, 0 100%);
-  transform: translate(-15px, -10px) rotate(-4deg);
+  transform: translate(-20px, -15px) rotate(-5deg);
 }
 .right-half {
   clip-path: polygon(80% 0, 100% 0, 100% 100%, 20% 100%);
-  transform: translate(15px, 10px) rotate(4deg);
+  transform: translate(20px, 15px) rotate(5deg);
 }
 .slash-line-indicator {
   position: absolute;
@@ -167,9 +204,9 @@
   left: 20%;
   width: 60%;
   height: 120%;
-  border-left: 4px dashed #ff007f;
+  border-left: 5px dashed #00aaff;
   transform: rotate(70deg);
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 /* Slide 3: Overwhelming Grid */
@@ -180,18 +217,18 @@
 .grid-overwhelmed {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+  gap: 20px;
   width: 100%;
-  max-width: 500px;
+  max-width: 650px;
   margin: 0 auto;
 }
 .grid-img {
   width: 100%;
-  height: 120px;
+  height: 150px;
   object-fit: cover;
-  border: 3px solid #fff;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+  border: 4px solid #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
 }
 
 /* Slide 4: Real vs AI Compare */
@@ -203,42 +240,42 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 30px;
+  gap: 40px;
   width: 100%;
 }
 .compare-card {
   position: relative;
-  width: 220px;
-  border: 4px solid #fff;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  width: 260px;
+  border: 6px solid #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
 }
 .compare-card img {
   width: 100%;
-  height: 200px;
+  height: 240px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 10px;
   display: block;
 }
 .badge {
   position: absolute;
-  top: -15px;
+  top: -20px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 6px 14px;
-  border-radius: 16px;
-  font-size: 16px;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 20px;
   font-weight: bold;
   color: white;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
 }
 .real-badge { background: #28a745; }
-.ai-badge { background: #ff007f; }
+.ai-badge { background: #00aaff; }
 
 /* UI overlay */
 .pres-ui {
   position: absolute;
-  bottom: 2vh;
+  bottom: 5vh;
   left: 0;
   width: 100%;
   display: flex;
@@ -251,34 +288,41 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 95%;
+  width: 90%;
+  max-width: 1200px;
   pointer-events: auto;
 }
 
-.wii-btn-small {
+/* Reverted back to full wii-btn with strong blue glow */
+.wii-btn {
   appearance: none;
   -webkit-appearance: none;
-  background: rgba(255, 255, 255, 0.9);
-  border: 2px solid #ccc;
-  border-radius: 30px;
-  padding: 10px 20px;
-  font-size: 20px;
+  background: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #e5e5e5 100%);
+  border: 0.25vw solid #d4d4d4;
+  border-radius: 4vw;
+  height: 4.5vw;
+  min-width: 14vw;
+  padding: 0 2.5vw;
+  font-size: 1.8vw;
   font-weight: bold;
   font-family: 'Asap', sans-serif;
   color: #333;
   cursor: url(../images/cursor.png), auto !important;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  transition: transform 150ms ease, box-shadow 150ms ease;
+  box-shadow: 0 0.5vw 1vw rgba(0,0,0,0.1), inset 0 0.2vw 0.5vw rgba(255,255,255,1);
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+  white-space: nowrap;
   outline: none;
 }
 
-.wii-btn-small:hover {
+.wii-btn:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 15px rgba(255,0,127,0.3);
-  border-color: #ff007f;
+  /* Strong blue glow requested by user */
+  box-shadow: 0 0 2vw 0.5vw rgba(0,170,255,0.7), inset 0 0.2vw 0.5vw rgba(255,255,255,1);
+  border-color: #00aaff;
 }
 
-.wii-btn-small:active {
+.wii-btn:active {
   transform: scale(0.95);
 }
 
@@ -296,10 +340,10 @@
 /* Glowing Slash Trail */
 .slash-trail {
   position: absolute;
-  height: 6px;
-  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 20%, rgba(255,0,127,1) 50%, rgba(255,255,255,1) 80%, rgba(255,255,255,0) 100%);
-  box-shadow: 0 0 15px #ff007f, 0 0 5px #ffffff;
-  border-radius: 3px;
+  height: 8px;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 20%, rgba(0,170,255,1) 50%, rgba(255,255,255,1) 80%, rgba(255,255,255,0) 100%);
+  box-shadow: 0 0 20px #00aaff, 0 0 8px #ffffff;
+  border-radius: 4px;
   transform-origin: left center;
   pointer-events: none;
   z-index: 100;
@@ -314,7 +358,6 @@
   left: 0;
   width: 100%;
   height: 100%;
-  /* No background here so only the inner content is seen slicing! */
   background: transparent;
   z-index: 25;
   pointer-events: none;
@@ -323,7 +366,6 @@
 
 .slice-half-1 {
   clip-path: polygon(0 0, 120% 0, 0 120%);
-  /* Continuous ease, no stops */
   animation: sliceUpLeft 0.7s cubic-bezier(0.5, 0, 0.2, 1) forwards;
   will-change: transform, opacity;
 }
