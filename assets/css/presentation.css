@@ -1,0 +1,175 @@
+/* Presentation Channel Styles */
+.presentation-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #f0f0f0;
+  font-family: 'Asap', sans-serif;
+  z-index: 10;
+}
+
+.pres-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.pres-slide.active {
+  visibility: visible;
+  opacity: 1;
+  z-index: 2;
+}
+
+.pres-content {
+  text-align: center;
+  width: 80%;
+  max-width: 900px;
+}
+
+.pres-content h1 {
+  font-size: 5vw;
+  color: #333;
+  margin-bottom: 2vh;
+}
+
+.pres-content p {
+  font-size: 2.2vw;
+  color: #555;
+  margin-bottom: 4vh;
+}
+
+.pres-image-placeholder {
+  width: 60%;
+  height: 35vh;
+  margin: 0 auto;
+  border: 4px dashed #ccc;
+  border-radius: 10px;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5vw;
+  color: #999;
+}
+
+/* UI overlay */
+.pres-ui {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 15vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  pointer-events: none; /* Let swipes pass through */
+}
+
+.pres-hint {
+  position: absolute;
+  right: 3vw;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Arial', sans-serif;
+  font-size: 1.2vw;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.pres-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2vw;
+  pointer-events: auto; /* Buttons are clickable */
+}
+
+.wii-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  background: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #e5e5e5 100%);
+  border: 0.25vw solid #d4d4d4;
+  border-radius: 4vw;
+  height: 4.5vw;
+  min-width: 12vw;
+  padding: 0 2.5vw;
+  font-size: 1.8vw;
+  font-weight: 500;
+  font-family: 'Asap', sans-serif;
+  color: #555;
+  cursor: url(../images/cursor.png), auto !important;
+  box-shadow: 0 0.5vw 1vw rgba(0,0,0,0.1), inset 0 0.2vw 0.5vw rgba(255,255,255,1);
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+  white-space: nowrap;
+  outline: none;
+}
+
+.wii-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0.6vw 1.2vw rgba(0,170,255,0.4), inset 0 0.2vw 0.5vw rgba(255,255,255,1);
+  border-color: #88ccff;
+}
+
+.wii-btn:active {
+  transform: scale(0.95);
+}
+
+/* Slicing Animation Classes */
+.slice-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.slice-half-1 {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  animation: sliceUpLeft 1s forwards cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 2px 2px 15px rgba(0,0,0,0.2);
+}
+
+.slice-half-2 {
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  animation: sliceDownRight 1s forwards cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: -2px -2px 15px rgba(0,0,0,0.2);
+}
+
+@keyframes sliceUpLeft {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-20vw, -20vh) rotate(-10deg); opacity: 0; }
+}
+
+@keyframes sliceDownRight {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(20vw, 20vh) rotate(10deg); opacity: 0; }
+}
+
+/* The invisible touch area to detect swipes */
+#swipe-zone {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 85vh; /* leave bottom for buttons */
+  z-index: 15;
+  cursor: crosshair;
+}

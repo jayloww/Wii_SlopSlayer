@@ -64,6 +64,7 @@ function loadViewContents(v, t) {
             presMusic.currentTime = 0;
             presMusic.play();
           }
+          if (typeof initPresentation === "function") initPresentation();
         } else {
           var presMusic = document.getElementById("presentation-music");
           if (presMusic) presMusic.pause();
