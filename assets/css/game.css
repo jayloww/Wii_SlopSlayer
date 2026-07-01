@@ -12,7 +12,7 @@
   background-repeat: no-repeat;
   position: relative;
   overflow: hidden;
-  cursor: none;
+  cursor: none !important;
 }
 
 #game-canvas {
@@ -33,7 +33,8 @@
   height: 100%;
   z-index: 10;
   display: block;
-  cursor: none;
+  cursor: none !important;
+  touch-action: none;
 }
 
 .game-hud {
@@ -357,7 +358,6 @@
   border-radius: 999px;
   background: #ffffff;
   color: #333;
-  cursor: url(../images/cursor.png), auto;
   outline: none;
   transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);

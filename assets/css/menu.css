@@ -120,6 +120,9 @@ body.channel-splash {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  user-drag: none;
   /* TODO: does not work in Edge/IE11 and has shoddy browser support */
   -webkit-clip-path: polygon(2% 7%, 6% 2%, 52% 1%, 95% 3%, 98% 8%, 100% 49%, 98% 92%, 95% 97%, 50% 99%, 5% 97%, 2% 93%, 0 50%);
   clip-path: polygon(2% 7%, 6% 2%, 52% 1%, 95% 3%, 98% 8%, 100% 49%, 98% 92%, 95% 97%, 50% 99%, 5% 97%, 2% 93%, 0 50%);
@@ -339,7 +342,6 @@ body.channel-splash {
   color: #474747 !important;
   font-size: 2.2vw;
   line-height: calc(4.5vw + 5px);
-  cursor: url(../images/cursor.png), auto !important; /* TODO: does not work in IE11, buggy in Chrome OS */
   transform: scale(1);
   transition: 150ms ease;
 }

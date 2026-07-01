@@ -130,25 +130,44 @@ setInterval(updateDateTime, 1000);
 
 $( document ).ready(function() {
   $(window).on("resize", fitChannelGrid);
-  // go to main menu when channel is clicked
-	$("body").on("click", ".occupied .hover", function(){
-		var centerX = $(this).offset().left + $(this).width() / 2;
-		var centerY = $(this).offset().top + $(this).height() / 2;
-		$( ".main-menu" ).css( {"transform-origin" : centerX + "px " + centerY + "px 0px"} );
+
+  // Block native image drag (Wii remote / mouse jitter otherwise drags the channel art)
+  document.addEventListener("dragstart", function (e) {
+    if (e.target && e.target.tagName === "IMG") e.preventDefault();
+  }, true);
+
+  // Use mousedown — Wii remotes often fail to produce a clean click event
+  $("body").on("mousedown", ".occupied .hover", function (e) {
+    if (e.button !== 0) return;
+    e.preventDefault();
+
+    zip();
+
+    var centerX = $(this).offset().left + $(this).width() / 2;
+    var centerY = $(this).offset().top + $(this).height() / 2;
+    $( ".main-menu" ).css( {"transform-origin" : centerX + "px " + centerY + "px 0px"} );
 
     var img = $( this ).attr( "data-img" );
-		$( ".splash-screen" ).css( {"background-image" : " url(" + img + ")", "transform-origin" : centerX + "px " + centerY + "px 0px"} );
+    $( ".splash-screen" ).css( {"background-image" : " url(" + img + ")", "transform-origin" : centerX + "px " + centerY + "px 0px"} );
 
-		$( ".main-menu" ).addClass( "channel-splash" );
-		$( "body" ).addClass( "channel-splash" );
-		delay(function(){
-			$( "body" ).removeClass( "splash-switch" );
-		}, 900 );
-		startIdleTimer();
-	});
+    $( ".main-menu" ).addClass( "channel-splash" );
+    $( "body" ).addClass( "channel-splash" );
+    delay(function(){
+      $( "body" ).removeClass( "splash-switch" );
+    }, 900 );
+    startIdleTimer();
+  });
+
+  $("body").on("mousedown", ".start-btn", function (e) {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    if (typeof startGame === "function") startGame();
+  });
 
 	// back to main menu
-	$("body").on("click", ".menu-btn", function(){
+	$("body").on("mousedown", ".menu-btn", function (e) {
+    if (e.button !== 0) return;
+    e.preventDefault();
 		stopIdleTimer();
 		$( ".main-menu" ).removeClass( "channel-splash" );
 		$( "body" ).removeClass( "channel-splash" );

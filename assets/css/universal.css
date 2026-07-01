@@ -18,9 +18,45 @@ body, html {
   user-select: none;
 }
 
+html,
 body,
-body * {
-  cursor: url(../images/cursor.png), auto !important;
+body *,
+body *::before,
+body *::after {
+  cursor: none !important;
+}
+
+html.wii-pointer-active,
+html.wii-pointer-active *,
+html.wii-pointer-active *::before,
+html.wii-pointer-active *::after {
+  cursor: none !important;
+}
+
+#wii-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  z-index: 2147483646;
+  transform: translate(2%, 2%);
+  display: none;
+  height: auto;
+  will-change: left, top, width;
+}
+
+img {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+.sfx {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
 
 body {
@@ -49,5 +85,5 @@ body.in-game * {
 
 body.end-screen-open,
 body.end-screen-open * {
-  cursor: url(../images/cursor.png), auto !important;
+  cursor: none !important;
 }

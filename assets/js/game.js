@@ -734,35 +734,60 @@ function slashLoop() {
 /* ── event helpers ── */
 function getSlashPos(e) {
   var r = slashCanvas.getBoundingClientRect();
-  var src = e.touches ? e.touches[0] : e;
+  var src = (e.touches && e.touches.length) ? e.touches[0] : e;
   return { x: src.clientX - r.left, y: src.clientY - r.top, time: Date.now() };
 }
 
-function onSlashMouseDown(e) {
-  if (e.button !== 0) return;
-  slashDrawing = true;
-  slashPath = [getSlashPos(e)];
-  e.preventDefault();
+function applySlashSegment(x1, y1, x2, y2) {
+  checkSliceCollisions(x1, y1, x2, y2);
 }
-function onSlashMouseMove(e) {
+
+function onSlashPointerDown(e) {
+  if (gameOver || !slashCanvas) return;
+  if (e.pointerType === "mouse" && e.button !== 0) return;
+
   var pos = getSlashPos(e);
+  var fromX = slashMouse.x;
+  var fromY = slashMouse.y;
+
   slashMouse.x = pos.x;
   slashMouse.y = pos.y;
-  if (slashDrawing) {
-    if (slashPath.length > 0) {
-      var prev = slashPath[slashPath.length - 1];
-      checkSliceCollisions(prev.x, prev.y, pos.x, pos.y);
-    }
-    slashPath.push(pos);
+  slashDrawing = true;
+  slashPath = [pos];
+
+  // Slice immediately on press (fixes gamepad B / click-without-drag)
+  applySlashSegment(fromX, fromY, pos.x, pos.y);
+  applySlashSegment(pos.x, pos.y, pos.x + 1, pos.y);
+
+  if (slashCanvas.setPointerCapture) {
+    try { slashCanvas.setPointerCapture(e.pointerId); } catch (err) { }
   }
   e.preventDefault();
 }
-function onSlashMouseUp(e) {
-  if (e.button !== 0) return;
-  slashDrawing = false;
+
+function onGlobalPointerMove(e) {
+  if (!slashCanvas || gameOver) return;
+
+  var pos = getSlashPos(e);
+  slashMouse.x = pos.x;
+  slashMouse.y = pos.y;
+
+  if (!slashDrawing) return;
+
+  if (slashPath.length > 0) {
+    var prev = slashPath[slashPath.length - 1];
+    applySlashSegment(prev.x, prev.y, pos.x, pos.y);
+  }
+  slashPath.push(pos);
+  e.preventDefault();
 }
-function onSlashMouseLeave() {
+
+function onSlashPointerUp(e) {
+  if (e.pointerType === "mouse" && e.button !== 0) return;
   slashDrawing = false;
+  if (slashCanvas && slashCanvas.releasePointerCapture) {
+    try { slashCanvas.releasePointerCapture(e.pointerId); } catch (err) { }
+  }
 }
 
 /* ── lifecycle ── */
@@ -774,14 +799,16 @@ function initGameSlash() {
   slashCtx = slashCanvas.getContext("2d");
   slashDrawing = false;
   slashPath = [];
+  slashMouse.x = window.innerWidth / 2;
+  slashMouse.y = window.innerHeight / 2;
 
   resizeSlashCanvas();
   $(window).on("resize.slash", resizeSlashCanvas);
 
-  slashCanvas.addEventListener("mousedown", onSlashMouseDown, { passive: false });
-  slashCanvas.addEventListener("mousemove", onSlashMouseMove, { passive: false });
-  slashCanvas.addEventListener("mouseup", onSlashMouseUp);
-  slashCanvas.addEventListener("mouseleave", onSlashMouseLeave);
+  slashCanvas.addEventListener("pointerdown", onSlashPointerDown, { passive: false });
+  window.addEventListener("pointermove", onGlobalPointerMove, { passive: false });
+  window.addEventListener("pointerup", onSlashPointerUp, { passive: false });
+  window.addEventListener("pointercancel", onSlashPointerUp, { passive: false });
 
   if (slashRAF) cancelAnimationFrame(slashRAF);
   slashRAF = requestAnimationFrame(slashLoop);
@@ -794,11 +821,12 @@ function stopGameSlash() {
   if (slashRAF) { cancelAnimationFrame(slashRAF); slashRAF = null; }
   $(window).off("resize.slash");
 
+  window.removeEventListener("pointermove", onGlobalPointerMove);
+  window.removeEventListener("pointerup", onSlashPointerUp);
+  window.removeEventListener("pointercancel", onSlashPointerUp);
+
   if (slashCanvas) {
-    slashCanvas.removeEventListener("mousedown", onSlashMouseDown);
-    slashCanvas.removeEventListener("mousemove", onSlashMouseMove);
-    slashCanvas.removeEventListener("mouseup", onSlashMouseUp);
-    slashCanvas.removeEventListener("mouseleave", onSlashMouseLeave);
+    slashCanvas.removeEventListener("pointerdown", onSlashPointerDown);
   }
 
   if (slashCtx && slashCanvas)
