@@ -714,6 +714,8 @@ var slashRAF = null;
 var slashDrawing = false;
 var slashPath = [];          // { x, y, time }  — timestamped points
 var slashMouse = { x: 0, y: 0 };
+var gameFilterX = new OneEuroFilter(0.8, 0.03, 1.0);
+var gameFilterY = new OneEuroFilter(0.8, 0.03, 1.0);
 
 var TRAIL_MS = 190;             // how long (ms) each point lives
 
@@ -847,7 +849,13 @@ function onSlashPointerDown(e) {
   if (gameOver || !slashCanvas) return;
   if (e.pointerType === "mouse" && e.button !== 0) return;
 
+  gameFilterX.reset();
+  gameFilterY.reset();
+
   var pos = getSlashPos(e);
+  pos.x = gameFilterX.filter(pos.x, pos.time);
+  pos.y = gameFilterY.filter(pos.y, pos.time);
+
   var fromX = slashMouse.x;
   var fromY = slashMouse.y;
 
@@ -870,6 +878,9 @@ function onGlobalPointerMove(e) {
   if (!slashCanvas || gameOver) return;
 
   var pos = getSlashPos(e);
+  pos.x = gameFilterX.filter(pos.x, pos.time);
+  pos.y = gameFilterY.filter(pos.y, pos.time);
+
   slashMouse.x = pos.x;
   slashMouse.y = pos.y;
 
@@ -902,6 +913,9 @@ function initGameSlash() {
   slashPath = [];
   slashMouse.x = window.innerWidth / 2;
   slashMouse.y = window.innerHeight / 2;
+
+  gameFilterX.reset();
+  gameFilterY.reset();
 
   resizeSlashCanvas();
   $(window).on("resize.slash", resizeSlashCanvas);

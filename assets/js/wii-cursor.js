@@ -3,6 +3,9 @@
   var CURSOR_SIZE_RATIO = 0.065;
   var cursorEl = null;
 
+  var filterX = new OneEuroFilter(0.8, 0.03, 1.0);
+  var filterY = new OneEuroFilter(0.8, 0.03, 1.0);
+
   function isActive() {
     return !document.body.classList.contains("in-game") ||
       document.body.classList.contains("end-screen-open");
@@ -26,7 +29,10 @@
   }
 
   function onPointerMove(e) {
-    moveTo(e.clientX, e.clientY);
+    var now = Date.now();
+    var filteredX = filterX.filter(e.clientX, now);
+    var filteredY = filterY.filter(e.clientY, now);
+    moveTo(filteredX, filteredY);
     if (isActive()) updateVisibility();
   }
 
