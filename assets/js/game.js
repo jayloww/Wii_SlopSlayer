@@ -7,7 +7,7 @@ var gameScore = 0;
 var gameOver = false;
 var playerLives = 3;
 const MAX_LIVES = 3;
-const DIFFICULTY_RAMP_SECONDS = 60;
+const DIFFICULTY_RAMP_SECONDS = 120;
 
 var ITEMS_POOL = [];
 var AI_POOL = [];
@@ -322,12 +322,12 @@ function getDifficultyProgress() {
 
 function getSpawnRateFrames() {
   const progress = getDifficultyProgress();
-  let frames = Math.floor(420 - 315 * progress);   // 420 → 105 over 60s
+  let frames = Math.floor(540 - 405 * progress);   // 540 → 135 over 120s
 
-  // Keep ramping after 60s so survival becomes nearly impossible
+  // Keep ramping after 120s so survival becomes nearly impossible
   if (gameElapsedSeconds > DIFFICULTY_RAMP_SECONDS) {
     const overtime = gameElapsedSeconds - DIFFICULTY_RAMP_SECONDS;
-    frames = Math.max(35, 105 - overtime * 2.5);
+    frames = Math.max(40, 135 - overtime * 1.5);
   }
 
   return frames;
@@ -549,8 +549,8 @@ function gameLoop(now) {
     spawnTimer += deltaMs * SPAWN_SPEED_MULTIPLIER;
     if (spawnTimer >= currentSpawnRateMs) {
       spawnTimer -= currentSpawnRateMs;
-      // Pair chance fades out by ~45s, stays off during peak difficulty
-      const pairChance = Math.max(0, 0.30 * (1 - gameElapsedSeconds / 45));
+      // Pair chance fades out by ~90s, stays off during peak difficulty
+      const pairChance = Math.max(0, 0.30 * (1 - gameElapsedSeconds / 90));
       if (Math.random() < pairChance) {
         throwPair();
       } else {
