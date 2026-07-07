@@ -9,7 +9,6 @@ This is a static site — open it through a local web server (not `file://`).
 **Option 1 — Python (built in on macOS):**
 
 ```bash
-cd Wii.JS
 python3 -m http.server 8000
 ```
 
