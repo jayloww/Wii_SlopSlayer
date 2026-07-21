@@ -7,7 +7,7 @@ var gameScore = 0;
 var gameOver = false;
 var playerLives = 3;
 const MAX_LIVES = 3;
-const DIFFICULTY_RAMP_SECONDS = 60;
+const DIFFICULTY_RAMP_SECONDS = 120;
 
 var ITEMS_POOL = [];
 var AI_POOL = [];
@@ -322,12 +322,12 @@ function getDifficultyProgress() {
 
 function getSpawnRateFrames() {
   const progress = getDifficultyProgress();
-  let frames = Math.floor(420 - 315 * progress);   // 420 → 105 over 60s
+  let frames = Math.floor(540 - 405 * progress);   // 540 → 135 over 120s
 
-  // Keep ramping after 60s so survival becomes nearly impossible
+  // Keep ramping after 120s so survival becomes nearly impossible
   if (gameElapsedSeconds > DIFFICULTY_RAMP_SECONDS) {
     const overtime = gameElapsedSeconds - DIFFICULTY_RAMP_SECONDS;
-    frames = Math.max(35, 105 - overtime * 2.5);
+    frames = Math.max(40, 135 - overtime * 1.5);
   }
 
   return frames;
@@ -549,8 +549,8 @@ function gameLoop(now) {
     spawnTimer += deltaMs * SPAWN_SPEED_MULTIPLIER;
     if (spawnTimer >= currentSpawnRateMs) {
       spawnTimer -= currentSpawnRateMs;
-      // Pair chance fades out by ~45s, stays off during peak difficulty
-      const pairChance = Math.max(0, 0.30 * (1 - gameElapsedSeconds / 45));
+      // Pair chance fades out by ~90s, stays off during peak difficulty
+      const pairChance = Math.max(0, 0.30 * (1 - gameElapsedSeconds / 90));
       if (Math.random() < pairChance) {
         throwPair();
       } else {
@@ -714,6 +714,8 @@ var slashRAF = null;
 var slashDrawing = false;
 var slashPath = [];          // { x, y, time }  — timestamped points
 var slashMouse = { x: 0, y: 0 };
+var gameFilterX = new OneEuroFilter(0.8, 0.03, 1.0);
+var gameFilterY = new OneEuroFilter(0.8, 0.03, 1.0);
 
 var TRAIL_MS = 190;             // how long (ms) each point lives
 
@@ -847,7 +849,13 @@ function onSlashPointerDown(e) {
   if (gameOver || !slashCanvas) return;
   if (e.pointerType === "mouse" && e.button !== 0) return;
 
+  gameFilterX.reset();
+  gameFilterY.reset();
+
   var pos = getSlashPos(e);
+  pos.x = gameFilterX.filter(pos.x, pos.time);
+  pos.y = gameFilterY.filter(pos.y, pos.time);
+
   var fromX = slashMouse.x;
   var fromY = slashMouse.y;
 
@@ -870,6 +878,9 @@ function onGlobalPointerMove(e) {
   if (!slashCanvas || gameOver) return;
 
   var pos = getSlashPos(e);
+  pos.x = gameFilterX.filter(pos.x, pos.time);
+  pos.y = gameFilterY.filter(pos.y, pos.time);
+
   slashMouse.x = pos.x;
   slashMouse.y = pos.y;
 
@@ -902,6 +913,9 @@ function initGameSlash() {
   slashPath = [];
   slashMouse.x = window.innerWidth / 2;
   slashMouse.y = window.innerHeight / 2;
+
+  gameFilterX.reset();
+  gameFilterY.reset();
 
   resizeSlashCanvas();
   $(window).on("resize.slash", resizeSlashCanvas);
