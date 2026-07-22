@@ -289,7 +289,7 @@ function sliceItem(item, idx, x1, y1, x2, y2) {
     var slashAudio = document.getElementById("slash-sound");
     if (slashAudio) {
       slashAudio.currentTime = 0;
-      slashAudio.volume = 0.15;
+      slashAudio.volume = 0.15 * (window.__kioskMasterVolume != null ? window.__kioskMasterVolume : 1);
       slashAudio.playbackRate = 0.8;
       slashAudio.play().catch(function (e) { });
     }
@@ -870,7 +870,8 @@ function applySlashSegment(x1, y1, x2, y2) {
 
 function onSlashPointerDown(e) {
   if (gameOver || !slashCanvas) return;
-  if (e.pointerType === "mouse" && e.button !== 0) return;
+  // Accept left (A) and right (B) — DolphinBar Mode 2 maps them to button 0 / 2
+  if (e.pointerType === "mouse" && e.button !== 0 && e.button !== 2) return;
 
   gameFilterX.reset();
   gameFilterY.reset();
@@ -918,7 +919,7 @@ function onGlobalPointerMove(e) {
 }
 
 function onSlashPointerUp(e) {
-  if (e.pointerType === "mouse" && e.button !== 0) return;
+  if (e.pointerType === "mouse" && e.button !== 0 && e.button !== 2) return;
   slashDrawing = false;
   if (slashCanvas && slashCanvas.releasePointerCapture) {
     try { slashCanvas.releasePointerCapture(e.pointerId); } catch (err) { }
