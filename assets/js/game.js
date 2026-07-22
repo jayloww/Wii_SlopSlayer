@@ -1115,8 +1115,6 @@ function showEndScreen() {
     return b.score - a.score;
   });
 
-  // Keep top 100 and store
-  leaderboard = leaderboard.slice(0, 100);
   localStorage.setItem("wii-game-leaderboard", JSON.stringify(leaderboard));
 
   // Helper to create an entry DOM element
