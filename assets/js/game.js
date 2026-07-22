@@ -893,7 +893,9 @@ function onSlashPointerDown(e) {
   applySlashSegment(fromX, fromY, pos.x, pos.y);
   applySlashSegment(pos.x, pos.y, pos.x + 1, pos.y);
 
-  if (slashCanvas.setPointerCapture) {
+  // A fatal slice above can end the game synchronously (stopGameSlash nulls
+  // slashCanvas) before we get here, e.g. an instant tap with no drag.
+  if (slashCanvas && slashCanvas.setPointerCapture) {
     try { slashCanvas.setPointerCapture(e.pointerId); } catch (err) { }
   }
   e.preventDefault();

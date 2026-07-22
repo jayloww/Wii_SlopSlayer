@@ -196,6 +196,20 @@ $( document ).ready(function() {
     if (typeof startGame === "function") startGame();
   });
 
+  // End screen buttons — use mousedown like every other button (see above),
+  // not onclick: Wii remotes often fail to produce a clean click event.
+  $("body").on("mousedown", ".end-btn:not(.end-btn-secondary)", function (e) {
+    if (e.button !== 0 && e.button !== 2) return;
+    e.preventDefault();
+    if (typeof restartGame === "function") restartGame();
+  });
+
+  $("body").on("mousedown", ".end-btn-secondary", function (e) {
+    if (e.button !== 0 && e.button !== 2) return;
+    e.preventDefault();
+    if (typeof endGoToMenu === "function") endGoToMenu();
+  });
+
 	// back to main menu
 	$("body").on("mousedown", ".menu-btn", function (e) {
     if (e.button !== 0 && e.button !== 2) return;
