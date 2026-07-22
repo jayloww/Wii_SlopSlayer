@@ -1,11 +1,11 @@
-.game-hud,
+﻿.game-hud,
 .game-hud * {
   cursor: none !important;
 }
 
 .game-screen {
-  width: 100vw;
-  height: 100vh;
+  width: 1920px;
+  height: 1080px;
   background-image: url(../images/4K_PinkCloud_BackgroundImage1.png);
   background-size: cover;
   background-position: center;
@@ -71,7 +71,7 @@
 
 .hud-score {
   font-family: 'Asap', sans-serif;
-  font-size: clamp(48px, 8vw, 80px);
+  font-size: clamp(48px, 153.6px, 80px);
   font-weight: 700;
   color: #ffffff;
   line-height: 1;
@@ -159,7 +159,7 @@
 
 .hud-timer {
   font-family: 'Asap', sans-serif;
-  font-size: clamp(40px, 6.8vw, 68px);
+  font-size: clamp(40px, 130.56px, 68px);
   font-weight: 700;
   color: #ffffff;
   line-height: 1;
@@ -171,12 +171,12 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: clamp(10px, 1.6vw, 20px);
+  gap: clamp(10px, 30.72px, 20px);
 }
 
 /* Pixel-art heart drawn on a 9x9 grid via box-shadow (crisp, scalable) */
 .life-icon {
-  --p: calc(clamp(40px, 6.8vw, 68px) / 9); /* heart height == timer height */
+  --p: calc(clamp(40px, 130.56px, 68px) / 9); /* heart height == timer height */
   --hb: #e85aa6; /* border  — darker pink   */
   --hf: #f9c9e6; /* fill    — light pink    */
   --hh: #ffffff; /* highlight — bright spot */
@@ -330,7 +330,7 @@
 }
 
 .end-score-value {
-  font-size: clamp(80px, 12vw, 110px);
+  font-size: clamp(80px, 230.4px, 110px);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.02em;

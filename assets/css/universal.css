@@ -1,8 +1,21 @@
-/* universal styling */
+﻿/* universal styling */
+
+/* Fixed reference resolution the whole app is designed at. JS scales/letterboxes
+   this box to fit any real screen size or aspect ratio (see main.js fitViewportStage). */
+#viewport-stage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: top left;
+  overflow: hidden;
+  background-color: black;
+}
 
 .app {
-  width: 100vw;
-  height: 100vh;
+  width: 1920px;
+  height: 1080px;
   background-color: black;
   display: block;
 }
@@ -65,10 +78,10 @@ body {
 
 .black {
   background-color: black;
-  width: 100vw;
-  height: 100vh;
+  width: 1920px;
+  height: 1080px;
   z-index: 999999999;
-  top: 100vh;
+  top: 1080px;
   opacity: 0;
   transition: opacity 300ms;
   position: absolute;

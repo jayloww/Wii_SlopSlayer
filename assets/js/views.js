@@ -79,7 +79,9 @@ function loadViewContents(v, t) {
               }
             }
             setTimeout(function(){
-              $( ".black" ).css( {"top" : "100vh"} );
+              // .black lives inside the fixed 1920x1080 #viewport-stage, so "off
+              // the bottom" is 1080px down, not 100vh of the real window.
+              $( ".black" ).css( {"top" : "1080px"} );
             }, transitionLength);
           }
         }

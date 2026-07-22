@@ -120,10 +120,14 @@ var deckReal = null;
 var spawnCountAI = 0;
 var spawnCountReal = 0;
 
+// The game canvas's CSS box is fixed at the app's 1920x1080 reference resolution
+// (see universal.css #viewport-stage) and is scaled visually as a whole by the
+// outer viewport transform, so its buffer must match that CSS size, not the real
+// window size (which would double-scale/distort everything on other-ratio screens).
 function resizeCanvas() {
   if (gameCanvas) {
-    gameCanvas.width = window.innerWidth;
-    gameCanvas.height = window.innerHeight;
+    gameCanvas.width = gameCanvas.clientWidth;
+    gameCanvas.height = gameCanvas.clientHeight;
   }
 }
 
@@ -184,7 +188,7 @@ function throwPair() {
 /* ── item dimensions helper ── */
 function getItemDims(img) {
   if (img.complete && img.naturalWidth > 0) {
-    const maxDim = Math.round(window.innerWidth * 0.17);
+    const maxDim = Math.round(gameCanvas.width * 0.17);
     const scale = maxDim / Math.max(img.naturalWidth, img.naturalHeight);
     return { w: img.naturalWidth * scale, h: img.naturalHeight * scale };
   }
@@ -803,14 +807,19 @@ function drawCursorRing(x, y) {
   ctx.restore();
 }
 
-/* ── resize ── */
+/* ── resize ──
+   Same reasoning as resizeCanvas(): size the buffer from the element's own
+   (fixed 1920x1080-reference) CSS box, not the real window, since the whole
+   app is scaled as one unit by the outer viewport transform. */
 function resizeSlashCanvas() {
   if (!slashCanvas) return;
   var dpr = window.devicePixelRatio || 1;
-  slashCanvas.width = window.innerWidth * dpr;
-  slashCanvas.height = window.innerHeight * dpr;
-  slashCanvas.style.width = window.innerWidth + "px";
-  slashCanvas.style.height = window.innerHeight + "px";
+  var cssWidth = slashCanvas.clientWidth;
+  var cssHeight = slashCanvas.clientHeight;
+  slashCanvas.width = cssWidth * dpr;
+  slashCanvas.height = cssHeight * dpr;
+  slashCanvas.style.width = cssWidth + "px";
+  slashCanvas.style.height = cssHeight + "px";
   slashCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
@@ -837,11 +846,22 @@ function slashLoop() {
   slashRAF = requestAnimationFrame(slashLoop);
 }
 
-/* ── event helpers ── */
+/* ── event helpers ──
+   getBoundingClientRect() reports the canvas's post-transform size on real
+   screen pixels (it accounts for the outer viewport scale), while our drawing
+   coordinates are in the canvas's own fixed CSS pixel space. Rescale pointer
+   coordinates through that ratio so slashes land under the cursor regardless
+   of the real screen's size/aspect ratio. */
 function getSlashPos(e) {
   var r = slashCanvas.getBoundingClientRect();
   var src = (e.touches && e.touches.length) ? e.touches[0] : e;
-  return { x: src.clientX - r.left, y: src.clientY - r.top, time: Date.now() };
+  var scaleX = slashCanvas.clientWidth / r.width;
+  var scaleY = slashCanvas.clientHeight / r.height;
+  return {
+    x: (src.clientX - r.left) * scaleX,
+    y: (src.clientY - r.top) * scaleY,
+    time: Date.now()
+  };
 }
 
 function applySlashSegment(x1, y1, x2, y2) {
@@ -914,8 +934,8 @@ function initGameSlash() {
   slashCtx = slashCanvas.getContext("2d");
   slashDrawing = false;
   slashPath = [];
-  slashMouse.x = window.innerWidth / 2;
-  slashMouse.y = window.innerHeight / 2;
+  slashMouse.x = slashCanvas.clientWidth / 2;
+  slashMouse.y = slashCanvas.clientHeight / 2;
 
   gameFilterX.reset();
   gameFilterY.reset();

@@ -1,3 +1,33 @@
+// The whole app is authored at a fixed 1920x1080 reference resolution (see
+// universal.css #viewport-stage). Scale + letterbox that box to fit whatever
+// real screen/window we're actually running on, so the layout, HUD and game
+// physics look identical regardless of the display's aspect ratio.
+var VIEWPORT_STAGE_WIDTH = 1920;
+var VIEWPORT_STAGE_HEIGHT = 1080;
+
+function fitViewportStage() {
+  var stage = document.getElementById("viewport-stage");
+  if (!stage) return;
+
+  var scale = Math.min(
+    window.innerWidth / VIEWPORT_STAGE_WIDTH,
+    window.innerHeight / VIEWPORT_STAGE_HEIGHT
+  );
+  var offsetX = (window.innerWidth - VIEWPORT_STAGE_WIDTH * scale) / 2;
+  var offsetY = (window.innerHeight - VIEWPORT_STAGE_HEIGHT * scale) / 2;
+
+  stage.style.transform = "translate(" + offsetX + "px, " + offsetY + "px) scale(" + scale + ")";
+}
+
+window.addEventListener("resize", fitViewportStage);
+// This script runs in <head>, before #viewport-stage (in <body>) exists yet,
+// so the very first fit has to wait for the DOM instead of running inline.
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", fitViewportStage);
+} else {
+  fitViewportStage();
+}
+
 //delay
 var delay = ( function() {
     var timer = 0;
@@ -177,8 +207,4 @@ $( document ).ready(function() {
 		}, 900 );
 	});
 
-	// ignore screen warning
-	$("body").on("click", ".screen-message", function(){
-		$( ".screen-message" ).addClass( "hidden" );
-	});
 });

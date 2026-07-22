@@ -1,22 +1,22 @@
-/* settings */
+﻿/* settings */
 
 .settings {
   background-color: black;
   background-image: url(../images/settings-main-bg.png);
-  width: 100vw;
-  height: 100vh;
+  width: 1920px;
+  height: 1080px;
 }
 
 .settings-header {
   background-color: black;
   background: url(../images/settings-topbar.png);
-  height: 16vh;
-  width: 100vw;
+  height: 172.8px;
+  width: 1920px;
   background-size: 15px 100%;
   padding: 0;
   margin: 0;
   position: relative;
-  top: -16vh;
+  top: -172.8px;
   transition: 300ms ease;
 }
 
@@ -27,25 +27,25 @@
 .settings-main .settings-header:after {
   position: absolute;
   background-image: url(../images/logo-white.svg);
-  width: 10vh;
-  height: 4.5vh;
+  width: 108px;
+  height: 48.6px;
   content: '';
   background-size: 100% 100%;
-  bottom: 2vh;
-  right: 12vw;
+  bottom: 21.6px;
+  right: 230.4px;
   display: block;
 }
 
 .settings-footer {
   background-color: black;
   background: url(../images/settings-bottombar.png);
-  height: 21vh;
-  width: 100vw;
+  height: 226.8px;
+  width: 1920px;
   background-size: 8px 100%;
   padding: 0;
   margin: 0;
   position: relative;
-  bottom: -21vh;
+  bottom: -226.8px;
   transition: 300ms ease;
 }
 
@@ -56,11 +56,11 @@
 .settings-navcontainer {
   position: absolute;
   /*top: 20%;*/
-  top: -100vh;
+  top: -1080px;
   opacity: 0;
   margin-left: auto;
   margin-right: auto;
-  left: calc(50% - 60vh);
+  left: calc(50% - 648px);
   transition: top 300ms;
 }
 
@@ -70,15 +70,15 @@
 }
 
 .settings-content {
-  height: calc(100vh - 37vh);
+  height: calc(1080px - 399.6px);
   overflow-x: hidden;
   overflow-y: auto;
   position: relative;
 }
 
 .settings-navbtn {
-  width: 50vh;
-  height: 38vh;
+  width: 540px;
+  height: 410.4px;
   background-image: url(../images/settings-main-nav.png);
   background-color: initial;
   background-size: 100% 100%;
@@ -91,16 +91,16 @@
   transform: scale(1.1);
 }
 
-.settings-navbtn.left { margin-right: 10vh; } .settings-navbtn.right { margin-left: 10vh; }
+.settings-navbtn.left { margin-right: 108px; } .settings-navbtn.right { margin-left: 108px; }
 
 .settings-navbtn span.label {
   position: absolute;
   display: block;
-  bottom: 1vh;
-  height: 10vh;
-  line-height: 10vh;
+  bottom: 10.8px;
+  height: 108px;
+  line-height: 108px;
   color: #909090;
-  font-size: 3.8vh;
+  font-size: 41.04px;
   font-family: 'Asap', sans-serif;
   width: 100%;
   box-sizing: border-box;
@@ -110,33 +110,33 @@
 
 .settings-navbtn.settings .icon {
   background-image: url(../images/settings-icon.png);
-  width: 20vh;
-  height: 20vh;
+  width: 216px;
+  height: 216px;
   background-size: 100% 100%;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 5vh;
+  margin-top: 54px;
 }
 
 .settings-navbtn.info .icon {
   background-image: url(../images/info-icon.png);
-  width: 20vh;
-  height: 20vh;
+  width: 216px;
+  height: 216px;
   background-size: 100% 100%;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 5vh;
+  margin-top: 54px;
 }
 
 .settings-footer .back {
   position: absolute;
   background-image: url(../images/settings-back.png);
-  width: 30vh;
-  height: 8vh;
+  width: 324px;
+  height: 86.4px;
   content: '';
   background-size: 100% 100%;
-  top: 6vh;
-  left: 12vw;
+  top: 64.8px;
+  left: 230.4px;
   display: block;
   transition: 150ms;
 }
