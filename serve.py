@@ -7,6 +7,11 @@ game.js / game.html after the code was updated. Sending "Cache-Control:
 no-store" on every response forces the browser to re-fetch the current files
 on each launch, so newly pulled changes always take effect.
 
+It also forces UTF-8 on text/JS/JSON responses via the Content-Type header,
+which is authoritative over any <meta charset> in the HTML — so UTF-8 glyphs
+(e.g. the leaderboard's bullet separator) never mojibake, even if a meta tag
+is edited out.
+
 Usage: python serve.py [port]   (default 8000)
 """
 import sys
@@ -19,6 +24,15 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
         self.send_header("Pragma", "no-cache")
         self.send_header("Expires", "0")
         super().end_headers()
+
+    def guess_type(self, path):
+        ctype = super().guess_type(path)
+        if ctype and "charset=" not in ctype and (
+            ctype.startswith("text/")
+            or ctype in ("application/javascript", "application/json")
+        ):
+            ctype += "; charset=utf-8"
+        return ctype
 
 
 if __name__ == "__main__":

@@ -37,15 +37,16 @@ var delay = ( function() {
     };
 })();
 
-// idle timer — returns to main menu after 1 minute of no interaction
+// Idle auto-return timers. Each screen arms the timer with its own timeout and
+// the action to run when it fires, so different screens can differ:
+//  - Slop Slayer channel splash (Start / Wii Menu): 30s -> back to Wii menu
+//  - Game over screen: 60s -> back to Wii menu
 var idleTimer = null;
 var idleActive = false;
-var IDLE_TIMEOUT_MS = 60000;
+var idleTimeoutMs = 60000;
+var idleAction = null;
 
 function idleReturnToMenu() {
-  idleActive = false;
-  clearTimeout(idleTimer);
-
   // stop game if running
   if (typeof stopGameTimer === "function") stopGameTimer();
 
@@ -66,20 +67,34 @@ function idleReturnToMenu() {
   if (typeof changeView === "function") changeView("menu", "fade");
 }
 
+function fireIdle() {
+  idleActive = false;
+  clearTimeout(idleTimer);
+  var action = idleAction;
+  idleAction = null;
+  if (typeof action === "function") action();
+}
+
 function resetIdleTimer() {
   if (!idleActive) return;
   clearTimeout(idleTimer);
-  idleTimer = setTimeout(idleReturnToMenu, IDLE_TIMEOUT_MS);
+  idleTimer = setTimeout(fireIdle, idleTimeoutMs);
 }
 
-function startIdleTimer() {
+// startIdleTimer(ms, action): return to the Wii menu after `ms` of inactivity.
+// `action` defaults to the channel-splash return; the game over screen passes
+// its own (endGoToMenu) so its cleanup runs.
+function startIdleTimer(ms, action) {
   idleActive = true;
+  idleTimeoutMs = ms || 60000;
+  idleAction = action || idleReturnToMenu;
   clearTimeout(idleTimer);
-  idleTimer = setTimeout(idleReturnToMenu, IDLE_TIMEOUT_MS);
+  idleTimer = setTimeout(fireIdle, idleTimeoutMs);
 }
 
 function stopIdleTimer() {
   idleActive = false;
+  idleAction = null;
   clearTimeout(idleTimer);
 }
 
@@ -187,7 +202,8 @@ $( document ).ready(function() {
     delay(function(){
       $( "body" ).removeClass( "splash-switch" );
     }, 900 );
-    startIdleTimer();
+    // Channel splash (Start / Wii Menu screen): return to Wii menu after 30s idle.
+    startIdleTimer(30000);
   });
 
   $("body").on("mousedown", ".start-btn", function (e) {

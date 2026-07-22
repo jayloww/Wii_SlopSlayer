@@ -1196,7 +1196,10 @@ function showEndScreen() {
     if (currentRank > 5) {
       var sepDiv = document.createElement("div");
       sepDiv.className = "leaderboard-separator";
-      sepDiv.textContent = "• • •";
+      // Build the separator dots from a char code so this source stays pure
+      // ASCII and can never mojibake, regardless of how the bytes get decoded.
+      var dot = String.fromCharCode(0x2022);
+      sepDiv.textContent = dot + " " + dot + " " + dot;
       leaderboardEl.appendChild(sepDiv);
 
       var userEntry = leaderboard[currentRank - 1];
@@ -1216,6 +1219,9 @@ function showEndScreen() {
     idle.currentTime = 0;
     idle.play();
   }
+
+  // Auto-return to the Wii menu after 60s of inactivity on the game over screen.
+  if (typeof startIdleTimer === "function") startIdleTimer(60000, endGoToMenu);
 }
 
 function startGame() {
@@ -1226,6 +1232,7 @@ function startGame() {
 
 function restartGame() {
   select();
+  if (typeof stopIdleTimer === "function") stopIdleTimer();
   $("body").addClass("in-game").removeClass("end-screen-open");
   var el = document.getElementById("game-end-screen");
   if (el) el.classList.remove("visible");
@@ -1233,6 +1240,7 @@ function restartGame() {
 }
 
 function endGoToMenu() {
+  if (typeof stopIdleTimer === "function") stopIdleTimer();
   back();
   var idle = document.getElementById("idle-music");
   if (idle) idle.pause();
