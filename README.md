@@ -22,6 +22,12 @@ npx serve
 
 Use the URL printed in the terminal (usually [http://localhost:3000](http://localhost:3000)).
 
+## Exhibition mode (Windows)
+
+Double-click `start.bat`. It starts a local server and launches Google Chrome in kiosk mode pointed at the app — no address bar, no window chrome. Closing the Chrome window shuts the server down too. Requires Chrome to be installed and Python to be on `PATH`.
+
+Right-clicking (and middle-clicking) inside the app is remapped to act like a left click, and the browser context menu is disabled — visitors can't get at anything but left-click interaction.
+
 ## Controls
 
 - **Menu:** Wii-style cursor — click channels to open them, use the splash screen to start the game.

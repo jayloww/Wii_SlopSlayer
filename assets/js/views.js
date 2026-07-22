@@ -70,7 +70,9 @@ function loadViewContents(v, t) {
                   var bg = document.getElementById("bg-music");
             	if (bg) bg.play();
                   var idle = document.getElementById("idle-music");
-                if (idle) idle.pause();
+                if (idle) { idle.pause(); idle.currentTime = 0; }
+                  var gameMusic = document.getElementById("game-music");
+                if (gameMusic) { gameMusic.pause(); gameMusic.currentTime = 0; }
 
               // play startup sound if it's the first time
               if (previousView === "default") {

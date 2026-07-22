@@ -112,9 +112,11 @@ function zip(){
 // back
 function back(){
 	var audio = document.getElementById("back");
-	audio.play();
+	if (audio) audio.play();
 	var idle = document.getElementById("idle-music");
-	if (idle) idle.pause();
+	if (idle) { idle.pause(); idle.currentTime = 0; }
+	var gameMusic = document.getElementById("game-music");
+	if (gameMusic) { gameMusic.pause(); gameMusic.currentTime = 0; }
 	var bg = document.getElementById("bg-music");
 	if (bg) bg.play();
 }
@@ -199,6 +201,7 @@ $( document ).ready(function() {
     if (e.button !== 0) return;
     e.preventDefault();
 		stopIdleTimer();
+		back();
 		$( ".main-menu" ).removeClass( "channel-splash" );
 		$( "body" ).removeClass( "channel-splash" );
 		$( "body" ).addClass( "splash-switch" );
