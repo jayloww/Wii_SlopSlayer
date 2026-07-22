@@ -30,7 +30,10 @@ if not defined CHROME (
 )
 
 echo Launching Chrome in kiosk mode...
-start "" /wait "%CHROME%" --kiosk --incognito --noerrdialogs --disable-pinch --overscroll-history-navigation=0 --disable-session-crashed-bubble "%URL%"
+rem Dedicated profile (not --incognito) so localStorage (highscore/leaderboard)
+rem survives across kiosk restarts instead of being wiped with the session.
+set "PROFILE_DIR=%APP_DIR%.chrome-kiosk-profile"
+start "" /wait "%CHROME%" --kiosk --user-data-dir="%PROFILE_DIR%" --no-first-run --noerrdialogs --disable-pinch --overscroll-history-navigation=0 --disable-session-crashed-bubble "%URL%"
 
 :cleanup
 echo Closing local server...
