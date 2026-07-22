@@ -32,22 +32,8 @@
         <div class="end-score-label">SCORE</div>
         <div class="end-score-value" id="end-score-value">0</div>
         <div id="new-highscore-banner" class="new-highscore-banner">NEW HIGHSCORE!</div>
-        <div class="end-highscore">HIGHSCORE &nbsp;<span id="end-highscore-value">0</span></div>
-        <div class="end-stats">
-          <div class="end-stat end-stat-ai">
-            <span class="end-stat-num" id="end-stat-ai">0</span>
-            <span class="end-stat-label">AI DESTROYED</span>
-          </div>
-          <div class="end-stat-divider"></div>
-          <div class="end-stat end-stat-real">
-            <span class="end-stat-num" id="end-stat-real">0</span>
-            <span class="end-stat-label">REAL SLICED</span>
-          </div>
-          <div class="end-stat-divider"></div>
-          <div class="end-stat end-stat-missed">
-            <span class="end-stat-num" id="end-stat-missed">0</span>
-            <span class="end-stat-label">AI MISSED</span>
-          </div>
+        <div class="end-mistakes" id="end-mistakes">
+          <!-- Populated by JS with the images that cost lives -->
         </div>
         <div class="end-buttons">
           <button class="end-btn" onclick="restartGame()">Play Again</button>

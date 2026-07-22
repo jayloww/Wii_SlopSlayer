@@ -24,6 +24,7 @@ var missFlashAlpha = 0;
 var slicedAI = 0;
 var slicedReal = 0;
 var missedAI = 0;
+var lifeMistakes = []; // { image, reason: "cut" | "missed" }
 var currentCombo = 0;
 const GRAVITY = 0.082;
 const FRAME_MS = 1000 / 60;
@@ -311,6 +312,7 @@ function sliceItem(item, idx, x1, y1, x2, y2) {
     slicedReal++;
     resetCombo();
     playRealSliceErrorSound();
+    lifeMistakes.push({ image: item.image, reason: "cut" });
     loseLife();
   }
   updateGameHud();
@@ -573,6 +575,7 @@ function gameLoop(now) {
         resetCombo();
         playMissSound();
         spawnMissIndicator(item.x);
+        lifeMistakes.push({ image: item.image, reason: "missed" });
         loseLife();
       }
       gameItems.splice(i, 1);
@@ -983,6 +986,7 @@ function initGame() {
   spawnCountAI = 0;
   spawnCountReal = 0;
   missedAI = 0;
+  lifeMistakes = [];
   currentCombo = 0;
   floatIndicators = [];
   missFlashAlpha = 0;
@@ -1051,13 +1055,41 @@ function showEndScreen() {
     if (bannerEl) bannerEl.classList.add("show");
   }
 
-  document.getElementById("end-highscore-value").textContent = formatScore(getHighScore());
-  document.getElementById("end-stat-ai").textContent = slicedAI;
-  document.getElementById("end-stat-real").textContent = slicedReal;
+  var mistakesEl = document.getElementById("end-mistakes");
+  if (mistakesEl) {
+    mistakesEl.innerHTML = "";
+    lifeMistakes.forEach(function (mistake) {
+      var card = document.createElement("div");
+      card.className = "end-mistake end-mistake-" + mistake.reason;
 
-  // Set missed AI images count
-  var missedEl = document.getElementById("end-stat-missed");
-  if (missedEl) missedEl.textContent = missedAI;
+      var imgWrap = document.createElement("div");
+      imgWrap.className = "end-mistake-img";
+      var img = document.createElement("img");
+      img.src = mistake.image.src;
+      img.alt = "";
+      img.draggable = false;
+
+      function sizeLikeGameCard() {
+        if (!img.naturalWidth) return;
+        var maxDim = 180;
+        var scale = maxDim / Math.max(img.naturalWidth, img.naturalHeight);
+        img.style.width = Math.round(img.naturalWidth * scale) + "px";
+        img.style.height = Math.round(img.naturalHeight * scale) + "px";
+      }
+      if (img.complete) sizeLikeGameCard();
+      else img.onload = sizeLikeGameCard;
+
+      imgWrap.appendChild(img);
+
+      var label = document.createElement("span");
+      label.className = "end-mistake-label";
+      label.textContent = mistake.reason === "cut" ? "WRONG CUT" : "MISSED";
+
+      card.appendChild(imgWrap);
+      card.appendChild(label);
+      mistakesEl.appendChild(card);
+    });
+  }
 
   // Manage leaderboard
   var leaderboard = [];
