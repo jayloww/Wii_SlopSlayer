@@ -8,7 +8,9 @@ set "URL=http://localhost:%PORT%"
 cd /d "%APP_DIR%"
 
 echo Starting local server on %URL% ...
-start "SlopSlayer Server" /min cmd /c "python -m http.server %PORT%"
+rem serve.py sends no-cache headers so the persistent Chrome profile below never
+rem serves stale game.js / game.html after the code is updated.
+start "SlopSlayer Server" /min cmd /c "python serve.py %PORT%"
 
 rem give the server a moment to come up
 timeout /t 2 /nobreak >nul
@@ -33,6 +35,12 @@ echo Launching Chrome in kiosk mode...
 rem Dedicated profile (not --incognito) so localStorage (highscore/leaderboard)
 rem survives across kiosk restarts instead of being wiped with the session.
 set "PROFILE_DIR=%APP_DIR%.chrome-kiosk-profile"
+
+rem Clear only the HTTP cache from the profile so freshly pulled game.js /
+rem game.html always load, while Local Storage (highscore/leaderboard) is kept.
+for %%C in ("Cache" "Code Cache" "GPUCache" "Service Worker") do (
+  if exist "%PROFILE_DIR%\Default\%%~C" rmdir /s /q "%PROFILE_DIR%\Default\%%~C"
+)
 start "" /wait "%CHROME%" --kiosk --user-data-dir="%PROFILE_DIR%" --no-first-run --noerrdialogs --disable-pinch --overscroll-history-navigation=0 --disable-session-crashed-bubble "%URL%"
 
 :cleanup

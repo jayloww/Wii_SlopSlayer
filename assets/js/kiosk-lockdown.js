@@ -60,25 +60,38 @@
   // driver, which opens the Start menu at the OS shell level — before our
   // keydown listener above ever sees it, so preventDefault() can't stop it.
   // The Keyboard Lock API is the one thing that *can* claim system keys like
-  // Meta, but only while the page is in real Fullscreen API mode (not just
-  // the --kiosk window) and after a user gesture, so we grab both on first click.
-  var keyboardLockArmed = false;
-  function armKeyboardLock() {
-    if (keyboardLockArmed) return;
-    keyboardLockArmed = true;
-
-    var wantFullscreen = !document.fullscreenElement
-      ? document.documentElement.requestFullscreen().catch(function () { })
-      : Promise.resolve();
-
-    wantFullscreen.then(function () {
-      if (navigator.keyboard && navigator.keyboard.lock) {
-        navigator.keyboard.lock(["MetaLeft", "MetaRight"]).catch(function () {
-          keyboardLockArmed = false;
-        });
-      }
-    });
+  // the Windows/Meta key, but ONLY while the page is in real Fullscreen API
+  // mode (the --kiosk window alone does not count) and after a user gesture.
+  // So on the first click we enter Fullscreen API mode and lock every key;
+  // locked keys are delivered to the page (where blockKey() above swallows
+  // them) instead of the OS. Trackpad swipe-to-exit is unaffected (OS level).
+  function engageKeyboardLock() {
+    if (navigator.keyboard && navigator.keyboard.lock) {
+      // No arguments = capture ALL keys (Meta/Win, Esc, etc.).
+      navigator.keyboard.lock().catch(function () { });
+    }
   }
-  document.addEventListener("pointerdown", armKeyboardLock, { capture: true, once: true });
-  document.addEventListener("mousedown", armKeyboardLock, { capture: true, once: true });
+
+  function armLockdown() {
+    if (document.fullscreenElement) {
+      engageKeyboardLock();
+    } else if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen()
+        .then(engageKeyboardLock)
+        .catch(function () { });
+    }
+  }
+
+  // Try on the first user gesture (Fullscreen + Keyboard Lock both require one).
+  document.addEventListener("pointerdown", armLockdown, { capture: true, once: true });
+  document.addEventListener("mousedown", armLockdown, { capture: true, once: true });
+
+  // If fullscreen is ever lost the keyboard lock is released with it; re-arm so
+  // the next click re-enters fullscreen and re-locks the Windows key.
+  document.addEventListener("fullscreenchange", function () {
+    if (!document.fullscreenElement) {
+      document.addEventListener("pointerdown", armLockdown, { capture: true, once: true });
+      document.addEventListener("mousedown", armLockdown, { capture: true, once: true });
+    }
+  });
 })();
