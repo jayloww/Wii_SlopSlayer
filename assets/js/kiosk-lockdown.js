@@ -1,68 +1,42 @@
-// Kiosk lockdown: only pointer move + click/swipe. Everything else is blocked.
-// Right/middle mouse buttons are remapped to left click so A and B both work.
+// Kiosk lockdown: only left click (A) and right click (B) do anything.
+// Everything else — middle click, back/forward side buttons, keyboard,
+// wheel/scroll — is inert. Trackpad gestures used to exit the kiosk are
+// handled by the OS below the browser, so they're untouched here.
 (function () {
-  function remapMouse(type, e) {
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    e.target.dispatchEvent(new MouseEvent(type, {
-      bubbles: true,
-      cancelable: true,
-      view: window,
-      clientX: e.clientX,
-      clientY: e.clientY,
-      screenX: e.screenX,
-      screenY: e.screenY,
-      button: 0,
-      buttons: type === "mouseup" ? 0 : 1,
-      relatedTarget: e.relatedTarget
-    }));
+  function isAllowedButton(e) {
+    return e.button === 0 || e.button === 2;
   }
 
-  function remapPointer(type, e) {
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    e.target.dispatchEvent(new PointerEvent(type, {
-      bubbles: true,
-      cancelable: true,
-      view: window,
-      clientX: e.clientX,
-      clientY: e.clientY,
-      screenX: e.screenX,
-      screenY: e.screenY,
-      button: 0,
-      buttons: (type === "pointerup" || type === "pointercancel") ? 0 : 1,
-      pointerId: e.pointerId,
-      pointerType: e.pointerType || "mouse",
-      isPrimary: e.isPrimary !== false,
-      width: e.width || 1,
-      height: e.height || 1,
-      pressure: typeof e.pressure === "number" ? e.pressure : 0.5,
-      relatedTarget: e.relatedTarget
-    }));
-  }
-
-  // No context menu
+  // No context menu on right click
   document.addEventListener("contextmenu", function (e) {
     e.preventDefault();
     e.stopImmediatePropagation();
   }, true);
 
-  // Remap non-left mouse buttons → left click
-  ["mousedown", "mouseup"].forEach(function (type) {
+  // Block any mouse button that isn't A (left) or B (right) — no remapping,
+  // just make sure it does nothing at all.
+  ["mousedown", "mouseup", "click"].forEach(function (type) {
     document.addEventListener(type, function (e) {
-      if (e.button !== 0) remapMouse(type, e);
+      if (!isAllowedButton(e)) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
     }, true);
   });
 
-  // Remap non-left pointer buttons → left click (needed for in-game slash)
   ["pointerdown", "pointerup", "pointercancel"].forEach(function (type) {
     document.addEventListener(type, function (e) {
-      if (e.pointerType === "mouse" && e.button !== 0) remapPointer(type, e);
+      if (e.pointerType === "mouse" && !isAllowedButton(e)) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
     }, true);
   });
 
+  // auxclick fires for middle/side buttons on release — block it outright
   document.addEventListener("auxclick", function (e) {
-    remapMouse("click", e);
+    e.preventDefault();
+    e.stopImmediatePropagation();
   }, true);
 
   // Block scroll / zoom gestures from the remote

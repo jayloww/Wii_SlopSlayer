@@ -170,7 +170,7 @@ $( document ).ready(function() {
 
   // Use mousedown — Wii remotes often fail to produce a clean click event
   $("body").on("mousedown", ".occupied .hover", function (e) {
-    if (e.button !== 0) return;
+    if (e.button !== 0 && e.button !== 2) return;
     e.preventDefault();
 
     zip();
@@ -191,14 +191,14 @@ $( document ).ready(function() {
   });
 
   $("body").on("mousedown", ".start-btn", function (e) {
-    if (e.button !== 0) return;
+    if (e.button !== 0 && e.button !== 2) return;
     e.preventDefault();
     if (typeof startGame === "function") startGame();
   });
 
 	// back to main menu
 	$("body").on("mousedown", ".menu-btn", function (e) {
-    if (e.button !== 0) return;
+    if (e.button !== 0 && e.button !== 2) return;
     e.preventDefault();
 		stopIdleTimer();
 		back();

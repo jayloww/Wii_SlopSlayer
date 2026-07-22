@@ -870,8 +870,9 @@ function applySlashSegment(x1, y1, x2, y2) {
 
 function onSlashPointerDown(e) {
   if (gameOver || !slashCanvas) return;
-  // Any mouse button can start a slash (A or B on the Wiimote)
-  if (e.pointerType === "mouse" && e.button > 2) return;
+  // Only left (A) or right (B) click can start a slash — everything else
+  // (middle click, back/forward side buttons, etc.) is ignored outright.
+  if (e.pointerType === "mouse" && e.button !== 0 && e.button !== 2) return;
 
   gameFilterX.reset();
   gameFilterY.reset();
@@ -919,7 +920,7 @@ function onGlobalPointerMove(e) {
 }
 
 function onSlashPointerUp(e) {
-  if (e.pointerType === "mouse" && e.button > 2) return;
+  if (e.pointerType === "mouse" && e.button !== 0 && e.button !== 2) return;
   slashDrawing = false;
   if (slashCanvas && slashCanvas.releasePointerCapture) {
     try { slashCanvas.releasePointerCapture(e.pointerId); } catch (err) { }
